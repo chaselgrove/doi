@@ -2,7 +2,7 @@
 
 import json
 import ezid
-from .config import doi_prefix, auth0, auth1
+from .config import umms_doi_prefix, umms_auth, test_auth
 from . import db
 
 select_sql = "SELECT metadata, landing_page FROM doi WHERE identifier = %s"
@@ -33,10 +33,10 @@ class DOI(ezid.DOI):
         return
 
     def update_metadata(self, metadata):
-        if self.identifier.startswith(doi_prefix):
-            auth = auth0
+        if self.identifier.startswith(umms_doi_prefix):
+            auth = umms_auth
         else:
-            auth = auth1
+            auth = test_auth
         ezid.DOI.update_metadata(self, metadata, auth)
         with db.DBCursor() as c:
             c.execute(update_metadata_sql, 
@@ -44,10 +44,10 @@ class DOI(ezid.DOI):
         return
 
     def update_landing_page(self, landing_page):
-        if self.identifier.startswith(doi_prefix):
-            auth = auth0
+        if self.identifier.startswith(umms_doi_prefix):
+            auth = umms_auth
         else:
-            auth = auth1
+            auth = test_auth
         ezid.DOI.update_landing_page(self, landing_page, auth)
         with db.DBCursor() as c:
             c.execute(update_landing_page_sql, 
@@ -57,10 +57,10 @@ class DOI(ezid.DOI):
 def mint(landing_page, metadata, test=False):
     if test:
         dp = ezid.test_prefix
-        auth = auth0
+        auth = test_auth
     else:
-        dp = doi_prefix
-        auth = auth1
+        dp = umms_doi_prefix
+        auth = umms_auth
     identifier = ezid.mint(landing_page, metadata, dp, auth)
     with db.DBCursor() as c:
         params = (identifier, json.dumps(metadata), landing_page)

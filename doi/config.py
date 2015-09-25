@@ -1,8 +1,14 @@
 """DOI configuration"""
 
-doi_prefix = '10.18116/C6'
+import ConfigParser
 
-auth0 = ('apitest', 'apitest')
-auth1 = ('apitest', 'apitest')
+cp = ConfigParser.ConfigParser()
+cp.read('/etc/doi.config')
+
+test_auth = (cp.get('test', 'username'), cp.get('test', 'password'))
+
+umms_auth = (cp.get('umms', 'username'), cp.get('umms', 'password'))
+
+umms_doi_prefix = cp.get('umms', 'prefix')
 
 # eof
