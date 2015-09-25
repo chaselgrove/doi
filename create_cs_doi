@@ -1,0 +1,88 @@
+#!/usr/bin/python
+
+import sys
+import doi
+
+cs_md = {}
+
+cs_md['creators'] = (('Frazier JA', 'Cambridge Health Alliance'), 
+                     ('Hodge SM', 'Massachusetts General Hospital'), 
+                     ('Breeze JL', 'Cambridge Health Alliance'), 
+                     ('Giuliano AJ', 'Cambridge Health Alliance'), 
+                     ('Terry JE', 'Cambridge Health Alliance'), 
+                     ('Moore CM', 'Cambridge Health Alliance'), 
+                     ('Kennedy DN', 'Massachusetts General Hospital'), 
+                     ('Lopez-Larson MP', 'Cambridge Health Alliance'), 
+                     ('Caviness VS', 'Massachusetts General Hospital'), 
+                     ('Seidman LJ', 'Massachusetts General Hospital'), 
+                     ('Zablotsky B', 'Cambridge Health Alliance'), 
+                     ('Makris N', 'Massachusetts General Hospital'))
+
+cs_md['title'] = 'CANDI Share Schizophrenia Bulletin 2008 data'
+
+cs_md['publisher'] = 'Child and Adolescent NeuroDevelopment Initiative'
+
+cs_md['publicationyear'] = '2008'
+
+mesh_url = 'http://www.ncbi.nlm.nih.gov/mesh'
+cs_md['subjects'] = (('Adolescent', 'MeSH', mesh_url), 
+                     ('Age of Onset', 'MeSH', mesh_url), 
+                     ('Amygdala/anatomy & histology', 'MeSH', mesh_url), 
+                     ('Amygdala/physiopathology', 'MeSH', mesh_url), 
+                     ('Bipolar Disorder/diagnosis', 'MeSH', mesh_url), 
+                     ('Bipolar Disorder/epidemiology', 'MeSH', mesh_url), 
+                     ('Bipolar Disorder/physiopathology', 'MeSH', mesh_url), 
+                     ('Child', 'MeSH', mesh_url), 
+                     ('Female', 'MeSH', mesh_url), 
+                     ('Hippocampus/anatomy & histology', 'MeSH', mesh_url), 
+                     ('Hippocampus/physiopathology', 'MeSH', mesh_url), 
+                     ('Humans', 'MeSH', mesh_url), 
+                     ('Limbic System/anatomy & histology', 'MeSH', mesh_url), 
+                     ('Magnetic Resonance Imaging', 'MeSH', mesh_url), 
+                     ('Male', 'MeSH', mesh_url), 
+                     ('Schizophrenia, Childhood/diagnosis', 'MeSH', mesh_url), 
+                     ('Schizophrenia, Childhood/epidemiology', 'MeSH', mesh_url), 
+                     ('Schizophrenia, Childhood/physiopathology', 'MeSH', mesh_url), 
+                     ('Severity of Illness Index', 'MeSH', mesh_url), 
+                     ('Sex Factors', 'MeSH', mesh_url))
+
+cs_md['contributors'] = (('ContactPerson', 
+                          'David Kennedy', 
+                          'UMass Medical School'), 
+                         ('Funder', 'NIMH'))
+
+cs_md['resourcetype'] = 'Dataset/Imaging Data'
+
+cs_md['alternateidentifiers'] = (('URL', 'http://doi.virtualbrain.org/xnat/app/template/XDATScreen_report_xnat_projectData.vm/search_element/xnat:projectData/search_field/xnat:projectData.ID/search_value/cs_schizbull08'), )
+
+cs_md['relatedidentifiers'] = (('18003631', 'PMID', 'IsDocumentedBy'), 
+                               ('doi:10.1093/schbul/sbm120', 'DOI', 'IsDocumentedBy'))
+
+cs_md['sizes'] = ('103 subjects', '206 volumes', '277845694 bytes')
+
+cs_md['formats'] = ('NIfTI-1', )
+
+cs_md['version'] = '1.1'
+
+cs_md['rights'] = (('Creative Commons Attribution 4.0 International License', 'https://creativecommons.org/licenses/by/4.0/'), )
+
+cs_md['descriptions'] = (('Abstract', """Data for CANDI Share Schizophrenia Bulletin 2008 (reference below) as part of the CANDI Neuroimaging Access Point. This set includes preprocessed MRI images and segmentation results of all 4 diagnostic groups (Healthy Controls, N=29; Schizophrenia Spectrum, N=20; Bipolar Disorder with Psychosis, N=19; and Bipolar Disorder without Psychosis, N=35). Frazier JA, Hodge SM, Breeze JL, Giuliano AJ, Terry JE, Moore CM, Kennedy DN, Lopez-Larson MP, Caviness VS, Seidman LJ, Zablotsky B, Makris N. Diagnostic and sex effects on limbic volumes in early-onset bipolar disorder and schizophrenia. Schizophr Bull. 2008 Jan;34(1):37-46."""), )
+
+cs_md['geolocation'] = 'Greater Boston, MA, USA'
+
+#doi.validate_metadata(cs_md)
+
+sys.exit(2)
+
+base_url = 'http://doi.virtualbrain.org'
+
+identifier = doi.mint(base_url, cs_md, True)
+
+d = doi.DOI(identifier)
+d.update_landing_page('%s/lp/%s' % (base_url, identifier))
+
+print identifier
+
+sys.exit(0)
+
+# eof
