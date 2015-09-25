@@ -68,11 +68,7 @@ cs_md['rights'] = (('Creative Commons Attribution 4.0 International License', 'h
 
 cs_md['descriptions'] = (('Abstract', """Data for CANDI Share Schizophrenia Bulletin 2008 (reference below) as part of the CANDI Neuroimaging Access Point. This set includes preprocessed MRI images and segmentation results of all 4 diagnostic groups (Healthy Controls, N=29; Schizophrenia Spectrum, N=20; Bipolar Disorder with Psychosis, N=19; and Bipolar Disorder without Psychosis, N=35). Frazier JA, Hodge SM, Breeze JL, Giuliano AJ, Terry JE, Moore CM, Kennedy DN, Lopez-Larson MP, Caviness VS, Seidman LJ, Zablotsky B, Makris N. Diagnostic and sex effects on limbic volumes in early-onset bipolar disorder and schizophrenia. Schizophr Bull. 2008 Jan;34(1):37-46."""), )
 
-cs_md['geolocation'] = 'Greater Boston, MA, USA'
-
-#doi.validate_metadata(cs_md)
-
-sys.exit(2)
+cs_md['geolocations'] = ('Greater Boston, MA, USA', )
 
 base_url = 'http://doi.virtualbrain.org'
 
