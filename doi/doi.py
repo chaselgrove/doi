@@ -62,8 +62,9 @@ def mint(landing_page, metadata, test=False):
         dp = umms_doi_prefix
         auth = umms_auth
     identifier = ezid.mint(landing_page, metadata, dp, auth)
+    md2 = ezid.validate_metadata(metadata)
     with db.DBCursor() as c:
-        params = (identifier, json.dumps(metadata), landing_page)
+        params = (identifier, json.dumps(md2), landing_page)
         c.execute(insert_sql, params)
     return identifier
 
