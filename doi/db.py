@@ -1,8 +1,7 @@
 """database routines"""
 
 import psycopg2
-
-dsn = "host=localhost dbname=doi user=doi password=doi"
+from .config import db_host, db_database, db_user, db_password
 
 class DBCursor:
 
@@ -12,7 +11,10 @@ class DBCursor:
         return
 
     def __enter__(self):
-        self.db = psycopg2.connect(dsn)
+        self.db = psycopg2.connect(host=db_host, 
+                                   dbname=db_database, 
+                                   user=db_user, 
+                                   password=db_password)
         self.c = self.db.cursor()
         return self.c
 
