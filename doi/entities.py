@@ -1,16 +1,27 @@
 """DOI project entities"""
 
+from .doi import DOI
 from .db import DBCursor
 
 class Project:
 
-    def __init__(self, doi):
+    def __init__(self, identifier):
+        with DBCursor() as c:
+            c.execute("SELECT * FROM project WHERE doi = %s", (identifier, ))
+            if c.rowcount == 0:
+                raise ValueError('project %s not found')
+            cols = [ el[0] for el in c.description ]
+            d = dict(zip(cols, c.fetchone()))
+            self.identifier = identifier
+            self.xnat_id = d['xnat_id']
+            self._doi = None
         return
 
-    def add_image(self, image):
-        if not isinstance(image, Image):
-            raise ValueError('image must be an Image instance')
-        return
+    @property
+    def doi(self):
+        if self._doi:
+            self._doi = DOI(self.identifier)
+        return self._doi
 
 class Subject:
 
@@ -37,12 +48,48 @@ class Subject:
 
 class Image:
 
-    def __init__(self, doi):
+    def __init__(self, identifier):
+        with DBCursor() as c:
+            c.execute("SELECT * FROM image WHERE doi = %s", (identifier, ))
+            if c.rowcount == 0:
+                raise ValueError('image %s not found')
+            cols = [ el[0] for el in c.description ]
+            d = dict(zip(cols, c.fetchone()))
+            self.identifier = identifier
+            self._subject_id = d['subject']
+            self._subject = None
+            self.type = d['type']
+            self.size = d['size']
+            self._doi = None
         return
+
+    @property
+    def subject(self):
+        if not self._subject:
+            self._subject = Subject(self._subject_id)
+        return self._subject
+
+    @property
+    def doi(self):
+        if self._doi:
+            self._doi = DOI(self.identifier)
+        return self._doi
 
 class Collection:
 
     def __init__(self, doi):
+        with DBCursor() as c:
+            c.execute("SELECT * FROM collection WHERE doi = %s", (identifier, ))
+            if c.rowcount == 0:
+                raise ValueError('collection %s not found')
+            self.identifier = identifier
+            self._doi = None
         return
+
+    @property
+    def doi(self):
+        if self._doi:
+            self._doi = DOI(self.identifier)
+        return self._doi
 
 # eof
