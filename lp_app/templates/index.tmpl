@@ -1,0 +1,21 @@
+<html>
+
+<head>
+<title>CANDI DOIs</title>
+</head>
+
+<body>
+
+<p>
+DOIs on this server:
+</p>
+
+<ul>
+{% for doi in dois %}
+    <li><a href="{{ base_url }}/{{ doi.identifier }}">{{ doi.metadata['title'] }}</a></li>
+{% endfor %}
+</ul>
+
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+<html>
+
+<head>
+
+<title>doi:{{ doi.identifier }}</title>
+
+<style type="text/css">
+table {
+    border: 1px solid #000;
+    border-collapse: collapse;
+}
+table td {
+    border: 1px solid #000;
+}
+</style>
+
+</head>
+
+<body>
+
+<table>
+
+    <tr>
+        <td>Identifier</td>
+        <td>{{ doi.identifier}}</td>
+    </tr>
+
+    <tr>
+        <td>Title</td>
+        <td>{{ doi.metadata['title'] }}</td>
+    </tr>
+
+    <tr>
+        <td>Creators</td>
+        <td>
+            {% for (name, affiliation) in doi.metadata['creators'] %}
+                {% if affiliation %}
+                    {{ name }} ({{ affiliation }})
+                {% else %}
+                    {{ name }}
+                {% endif %}
+                <br/>
+            {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
+        <td>Publisher</td>
+        <td>{{ doi.metadata['publisher'] }}</td>
+    </tr>
+
+    <tr>
+        <td>Publication year</td>
+        <td>{{ doi.metadata['publicationyear'] }}</td>
+    </tr>
+
+    <tr>
+        <td>Contributors</td>
+        <td>
+            {% for (type, name, affiliation) in doi.metadata['contributors'] %}
+                {% if affiliation %}
+                    {{ type }}: {{ name }} ({{ affiliation }})
+                {% else %}
+                    {{ type }}: {{ name }}
+                {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
+        <td>Resource type</td>
+        <td>{{ doi.metadata['resourcetype'] }}</td>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Related identifiers</td>
+        <td>
+            {% for (identifier, type, relation) in doi.metadata['relatedidentifiers'] %}
+                {% if type == 'PMID' %}
+                    {{ relation }} <a href="http://pubmed.org/{{ identifier }}">{{ type }} {{ identifier }}</a>
+                {% else %}
+                    {{ relation }} {{ type }} {{ identifier }}
+                {% endif %}
+                <br/>
+            {% endfor %}
+</td>
+    </tr>
+
+    <tr>
+        <td>Sizes</td>
+        <td>
+            {% for size in doi.metadata['sizes'] %}
+                {{ size }}
+                <br/>
+            {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
+        <td>Formats</td>
+        <td>
+            {% for format in doi.metadata['formats'] %}
+                {{ format }}
+                <br/>
+            {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
+        <td>Version</td>
+        <td>{{ doi.metadata['version'] }}</td>
+    </tr>
+
+</table>
+
+</body>
+
+</html>
