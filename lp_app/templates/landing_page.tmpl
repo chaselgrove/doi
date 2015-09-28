@@ -55,6 +55,30 @@ table td {
     </tr>
 
     <tr>
+        <td>Subjects</td>
+        <td>
+            {% for (subject, scheme, uri) in doi.metadata['subjects'] %}
+                {% if not scheme %}
+                    {{ subject }}
+                {% elif not uri %}
+                    {% if scheme == 'MeSH' %}
+                        MeSH {{ subject }}
+                    {% else %}
+                        {{ subject }} ({{ scheme }})
+                    {% endif %}
+                {% else %}
+                    {% if scheme == 'MeSH' %}
+                        <a href="{{ uri }}">MeSH</a> {{ subject }}
+                    {% else %}
+                        {{ subject }} (<a href="{{ uri }}">{{ scheme }}</a>)
+                    {% endif %}
+                {% endif %}
+                <br/>
+            {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
         <td>Contributors</td>
         <td>
             {% for (type, name, affiliation) in doi.metadata['contributors'] %}
@@ -63,6 +87,17 @@ table td {
                 {% else %}
                     {{ type }}: {{ name }}
                 {% endif %}
+            {% endfor %}
+            <br/>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Dates</td>
+        <td>
+            {% for (type, date) in doi.metadata['dates'] %}
+                {{ dates }} ({{ type }})
+                <br/>
             {% endfor %}
         </td>
     </tr>
@@ -74,17 +109,33 @@ table td {
     </tr>
 
     <tr>
+        <td>Alternate identifiers</td>
+        <td>
+            {% for (type, identifier) in doi.metadata['alternateidentifiers'] %}
+                {% if type == 'URL' %}
+                    <a href="{{ identifier }}">{{ identifier }}</a>
+                {% else %}
+                    {{ identifier }} ({{ type }})
+                {% endif %}
+                <br/>
+            {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
         <td>Related identifiers</td>
         <td>
             {% for (identifier, type, relation) in doi.metadata['relatedidentifiers'] %}
                 {% if type == 'PMID' %}
                     {{ relation }} <a href="http://pubmed.org/{{ identifier }}">{{ type }} {{ identifier }}</a>
+                {% elif type == 'DOI' %}
+                    {{ relation }} <a href="http://dx.doi.org/{{ identifier }}">{{ type }} {{ identifier }}</a>
                 {% else %}
                     {{ relation }} {{ type }} {{ identifier }}
                 {% endif %}
                 <br/>
             {% endfor %}
-</td>
+        </td>
     </tr>
 
     <tr>
@@ -110,6 +161,40 @@ table td {
     <tr>
         <td>Version</td>
         <td>{{ doi.metadata['version'] }}</td>
+    </tr>
+
+    <tr>
+        <td>Rights</td>
+        <td>
+            {% for (rights, uri) in doi.metadata['rights'] %}
+                {% if uri %}
+                    <a href="{{ uri }}">{{ rights }}</a>
+                {% else %}
+                    {{ rights }}
+                {% endif %}
+                <br/>
+            {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
+        <td>Descriptions</td>
+        <td>
+            {% for (type, description) in doi.metadata['descriptions'] %}
+                {{ description }} ({{ type }})
+                <br/>
+            {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
+        <td>Geolocations</td>
+        <td>
+            {% for place in doi.metadata['geolocations'] %}
+                {{ place }}
+                <br/>
+            {% endfor %}
+        </td>
     </tr>
 
 </table>
