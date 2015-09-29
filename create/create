@@ -15,68 +15,79 @@ def create(md):
     d.update_landing_page('%s/lp/%s' % (base_lp_url, d.identifier))
     return d
 
-def ibsr_anat_url(id):
+def anat_url(project, id):
     url = 'http://doi.virtualbrain.org/xnat/app/action/'
     url += 'DisplayItemAction/search_element/'
     url += 'xnat%3AmrSessionData/search_field/'
     url += 'xnat%3AmrSessionData.ID/search_value/'
     url += id
-    url += '/popup/false/project/ibsr'
+    url += '/popup/false/project/'
+    url += project
     return url
 
-def ibsr_seg_url(id):
+def seg_url(project, id):
     url = 'http://doi.virtualbrain.org/xnat/app/action/'
     url += 'DisplayItemAction/search_element/'
     url += 'ir%3ACandiShareSegData/search_field/'
     url += 'ir%3ACandiShareSegData.ID/search_value/'
     url += id
-    url += '/popup/false/project/ibsr'
+    url += '/popup/false/project/'
+    url += project
     return url
 
-candi_store_md = json.load(open('candi_store.json'))
-candi_store = create(candi_store_md)
-print 'created CANDI Store:', candi_store.identifier
+def create_images(project_code, project_name, project_doi, image_iterator):
+    images = []
+    for image_info in image_iterator():
+        md = {}
+        for key in ('creators', 
+                    'publisher', 
+                    'publicationyear', 
+                    'version', 
+                    'rights', 
+                    'geolocation'):
+            if key in project_doi.metadata:
+                md[key] = project_doi.metadata[key]
+        if image_info['Type'] == 'Anatomical MR':
+            md['resourcetype'] = 'Image/Structural MR'
+            url = anat_url(project_code, image_info['XNAT ID'])
+        elif image_info['Type'] == 'Manual Segmentation':
+            md['resourcetype'] = 'Image/Manual Segmentation'
+            url = seg_url(project_code, image_info['XNAT ID'])
+        else:
+            assert False
+        md['alternateidentifiers'] = (('URL', url), )
+        md['sizes'] = image_info['Sizes']
+        md['formats'] = ('NIfTI-1', )
+        md['title'] = '%s for %s subject %s' % (image_info['Type'], 
+                                                project_name, 
+                                                image_info['Subject'])
+        md['relatedidentifiers'] = ((project_doi.identifier, 
+                                     'DOI', 
+                                     'IsPartOf'), )
+        image = create(md)
+        print '    image:', image.identifier
+        images.append(image)
+    md = project_doi.copy_metadata()
+    if 'relatedidentifiers' not in md:
+        md['relatedidentifiers'] = []
+    for image in images:
+        md['relatedidentifiers'].append((image.identifier, 'DOI', 'HasPart'))
+    project_doi.update_metadata(md)
+    print 'updated %s with images' % project_code
+
+candi_share_md = json.load(open('candi_share.json'))
+candi_share = create(candi_share_md)
+print 'created CANDI Share:', candi_share.identifier
 
 ibsr_md = json.load(open('ibsr.json'))
 ibsr = create(ibsr_md)
 print 'created IBSR:', ibsr.identifier
 
-ibsr_images = []
-for ibsr_info in info.iteribsr():
-    md = {}
-    for key in ('creators', 
-                'publisher', 
-                'publicationyear', 
-                'version', 
-                'rights', 
-                'geolocation'):
-        if key in ibsr.metadata:
-            md[key] = ibsr.metadata[key]
-    if ibsr_info['Type'] == 'Anatomical MR':
-        md['resourcetype'] = 'Image/Structural MR'
-        url = ibsr_anat_url(ibsr_info['XNAT ID'])
-    elif ibsr_info['Type'] == 'Manual Segmentation':
-        md['resourcetype'] = 'Image/Manual Segmentation'
-        url = ibsr_seg_url(ibsr_info['XNAT ID'])
-    else:
-        assert False
-    md['alternateidentifiers'] = (('URL', url), )
-    md['sizes'] = ibsr_info['Sizes']
-    md['formats'] = ('NIfTI-1', )
-    md['title'] = '%s for IBSR subject %s' % (ibsr_info['Type'], 
-                                              ibsr_info['Subject'])
-    md['relatedidentifiers'] = ((ibsr.identifier, 'DOI', 'IsPartOf'), )
-    image = create(md)
-    print '    image:', image.identifier
-    ibsr_images.append(image)
-
-md = ibsr.copy_metadata()
-if 'relatedidentifiers' not in md:
-    md['relatedidentifiers'] = []
-for image in ibsr_images:
-    md['relatedidentifiers'].append((image.identifier, 'DOI', 'HasPart'))
-ibsr.update_metadata(md)
-print 'updated ibsr with images'
+create_images('ibsr', 'IBSR', ibsr, info.iteribsr)
+create_images('cs_schizbull08', 
+              'CANDI Share Schizophrenia Bulletin 2008', 
+              candi_share, 
+              info.itercs)
 
 sys.exit(0)
 

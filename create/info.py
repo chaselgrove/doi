@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import xml.dom.minidom
+import StringIO
+import csv
 import requests
 
 def get_xnat_info(project, subject, experiment):
@@ -47,6 +49,31 @@ def iteribsr():
         subject = str(i+1)
         experiment = '%s_MR' % subject
         (scan_info, assessor_info) = get_xnat_info('ibsr', subject, experiment)
+        d = {'Subject': subject, 
+             'Type': 'Anatomical MR', 
+             'Sizes': ('%d files' % scan_info[1], '%d bytes' % scan_info[2]), 
+             'XNAT ID': scan_info[0]}
+        yield d
+        d = {'Subject': subject, 
+             'Type': 'Manual Segmentation', 
+             'Sizes': ('%d files' % assessor_info[1], 
+                      '%d bytes' % assessor_info[2]), 
+             'XNAT ID': assessor_info[0]}
+        yield d
+    return
+
+def itercs():
+    url = 'http://doi.virtualbrain.org/xnat/data/projects/cs_schizbull08/subjects?format=csv'
+    r = requests.get(url)
+    r = csv.reader(StringIO.StringIO(r.content))
+    header = r.next()
+    subjects = []
+    for row in r:
+        row_dict = dict(zip(header, row))
+        subjects.append(row_dict['label'])
+    for subject in subjects:
+        experiment = '%s_MR' % subject
+        (scan_info, assessor_info) = get_xnat_info('cs_schizbull08', subject, experiment)
         d = {'Subject': subject, 
              'Type': 'Anatomical MR', 
              'Sizes': ('%d files' % scan_info[1], '%d bytes' % scan_info[2]), 
