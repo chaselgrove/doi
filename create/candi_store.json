@@ -1,0 +1,211 @@
+{
+    "publisher": "Child and Adolescent NeuroDevelopment Initiative", 
+    "publicationyear": "2008", 
+    "rights": [
+        [
+            "Creative Commons Attribution 4.0 International License", 
+            "https://creativecommons.org/licenses/by/4.0/"
+        ]
+    ], 
+    "version": "1.1", 
+    "contributors": [
+        [
+            "ContactPerson", 
+            "David Kennedy", 
+            "UMass Medical School"
+        ], 
+        [
+            "Funder", 
+            "NIMH"
+        ]
+    ], 
+    "title": "CANDI Share Schizophrenia Bulletin 2008 data", 
+    "resourcetype": "Dataset/Imaging Data", 
+    "sizes": [
+        "103 subjects", 
+        "206 volumes", 
+        "277845694 bytes"
+    ], 
+    "relatedidentifiers": [
+        [
+            "18003631", 
+            "PMID", 
+            "IsDocumentedBy"
+        ], 
+        [
+            "doi:10.1093/schbul/sbm120", 
+            "DOI", 
+            "IsDocumentedBy"
+        ]
+    ], 
+    "alternateidentifiers": [
+        [
+            "URL", 
+            "http://doi.virtualbrain.org/xnat/app/template/XDATScreen_report_xnat_projectData.vm/search_element/xnat:projectData/search_field/xnat:projectData.ID/search_value/cs_schizbull08"
+        ]
+    ], 
+    "subjects": [
+        [
+            "Adolescent", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Age of Onset", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Amygdala/anatomy & histology", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Amygdala/physiopathology", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Bipolar Disorder/diagnosis", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Bipolar Disorder/epidemiology", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Bipolar Disorder/physiopathology", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Child", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Female", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Hippocampus/anatomy & histology", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Hippocampus/physiopathology", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Humans", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Limbic System/anatomy & histology", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Magnetic Resonance Imaging", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Male", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Schizophrenia, Childhood/diagnosis", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Schizophrenia, Childhood/epidemiology", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Schizophrenia, Childhood/physiopathology", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Severity of Illness Index", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ], 
+        [
+            "Sex Factors", 
+            "MeSH", 
+            "http://www.ncbi.nlm.nih.gov/mesh"
+        ]
+    ], 
+    "descriptions": [
+        [
+            "Abstract", 
+            "Data for CANDI Share Schizophrenia Bulletin 2008 (reference below) as part of the CANDI Neuroimaging Access Point. This set includes preprocessed MRI images and segmentation results of all 4 diagnostic groups (Healthy Controls, N=29; Schizophrenia Spectrum, N=20; Bipolar Disorder with Psychosis, N=19; and Bipolar Disorder without Psychosis, N=35). Frazier JA, Hodge SM, Breeze JL, Giuliano AJ, Terry JE, Moore CM, Kennedy DN, Lopez-Larson MP, Caviness VS, Seidman LJ, Zablotsky B, Makris N. Diagnostic and sex effects on limbic volumes in early-onset bipolar disorder and schizophrenia. Schizophr Bull. 2008 Jan;34(1):37-46."
+        ]
+    ], 
+    "formats": [
+        "NIfTI-1"
+    ], 
+    "geolocations": [
+        "Greater Boston, MA, USA"
+    ], 
+    "creators": [
+        [
+            "Frazier JA", 
+            "Cambridge Health Alliance"
+        ], 
+        [
+            "Hodge SM", 
+            "Massachusetts General Hospital"
+        ], 
+        [
+            "Breeze JL", 
+            "Cambridge Health Alliance"
+        ], 
+        [
+            "Giuliano AJ", 
+            "Cambridge Health Alliance"
+        ], 
+        [
+            "Terry JE", 
+            "Cambridge Health Alliance"
+        ], 
+        [
+            "Moore CM", 
+            "Cambridge Health Alliance"
+        ], 
+        [
+            "Kennedy DN", 
+            "Massachusetts General Hospital"
+        ], 
+        [
+            "Lopez-Larson MP", 
+            "Cambridge Health Alliance"
+        ], 
+        [
+            "Caviness VS", 
+            "Massachusetts General Hospital"
+        ], 
+        [
+            "Seidman LJ", 
+            "Massachusetts General Hospital"
+        ], 
+        [
+            "Zablotsky B", 
+            "Cambridge Health Alliance"
+        ], 
+        [
+            "Makris N", 
+            "Massachusetts General Hospital"
+        ]
+    ]
+}

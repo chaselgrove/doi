@@ -1,0 +1,83 @@
+#!/usr/bin/python
+
+import sys
+import json
+import doi
+import info
+
+test_flag = True
+
+base_lp_url = 'http://doi.virtualbrain.org'
+
+def create(md):
+    """mint the DOI and update the landing page"""
+    d = doi.DOI(doi.mint(base_lp_url, md, test_flag))
+    d.update_landing_page('%s/lp/%s' % (base_lp_url, d.identifier))
+    return d
+
+def ibsr_anat_url(id):
+    url = 'http://doi.virtualbrain.org/xnat/app/action/'
+    url += 'DisplayItemAction/search_element/'
+    url += 'xnat%3AmrSessionData/search_field/'
+    url += 'xnat%3AmrSessionData.ID/search_value/'
+    url += id
+    url += '/popup/false/project/ibsr'
+    return url
+
+def ibsr_seg_url(id):
+    url = 'http://doi.virtualbrain.org/xnat/app/action/'
+    url += 'DisplayItemAction/search_element/'
+    url += 'ir%3ACandiShareSegData/search_field/'
+    url += 'ir%3ACandiShareSegData.ID/search_value/'
+    url += id
+    url += '/popup/false/project/ibsr'
+    return url
+
+candi_store_md = json.load(open('candi_store.json'))
+candi_store = create(candi_store_md)
+print 'created CANDI Store:', candi_store.identifier
+
+ibsr_md = json.load(open('ibsr.json'))
+ibsr = create(ibsr_md)
+print 'created IBSR:', ibsr.identifier
+
+ibsr_images = []
+for ibsr_info in info.iteribsr():
+    md = {}
+    for key in ('creators', 
+                'publisher', 
+                'publicationyear', 
+                'version', 
+                'rights', 
+                'geolocation'):
+        if key in ibsr.metadata:
+            md[key] = ibsr.metadata[key]
+    if ibsr_info['Type'] == 'Anatomical MR':
+        md['resourcetype'] = 'Image/Structural MR'
+        url = ibsr_anat_url(ibsr_info['XNAT ID'])
+    elif ibsr_info['Type'] == 'Manual Segmentation':
+        md['resourcetype'] = 'Image/Manual Segmentation'
+        url = ibsr_seg_url(ibsr_info['XNAT ID'])
+    else:
+        assert False
+    md['alternateidentifiers'] = (('URL', url), )
+    md['sizes'] = ibsr_info['Sizes']
+    md['formats'] = ('NIfTI-1', )
+    md['title'] = '%s for IBSR subject %s' % (ibsr_info['Type'], 
+                                              ibsr_info['Subject'])
+    md['relatedidentifiers'] = ((ibsr.identifier, 'DOI', 'IsPartOf'), )
+    image = create(md)
+    print '    image:', image.identifier
+    ibsr_images.append(image)
+
+md = ibsr.copy_metadata()
+if 'relatedidentifiers' not in md:
+    md['relatedidentifiers'] = []
+for image in ibsr_images:
+    md['relatedidentifiers'].append((image.identifier, 'DOI', 'HasPart'))
+ibsr.update_metadata(md)
+print 'updated ibsr with images'
+
+sys.exit(0)
+
+# eof

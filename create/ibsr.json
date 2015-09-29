@@ -1,0 +1,19 @@
+{
+    "publisher": "MGH CMA", 
+    "publicationyear": "2015", 
+    "contributors": [
+        [
+            "ContactPerson", 
+            "Andrew Worth", 
+            "Neuromorphometrics, Inc"
+        ]
+    ], 
+    "title": "Internet Brain Segmentation Repository", 
+    "resourcetype": "Dataset/Imaging Data", 
+    "creators": [
+        [
+            "Worth A", 
+            "MGH"
+        ]
+    ]
+}
