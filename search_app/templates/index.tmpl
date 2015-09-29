@@ -1,0 +1,31 @@
+<html>
+
+<head>
+<title>CANDI DOIs</title>
+</head>
+
+<body>
+
+{% if error %}
+    Error: {{ error }}
+{% endif %}
+
+<form action={{ post_url }} method="POST" >
+Gender
+<input type="radio" name="gender" value="female" checked="{{ form_dict['gender_female_checked'] }}"/> Female
+<input type="radio" name="gender" value="male" checked="{{ form_dict['gender_male_checked'] }}"/> Male
+<input type="radio" name="gender" value="either" checked="{{ form_dict['gender_either_checked'] }}"/> Either
+<br/>
+Age: min <input type="text" name="age_min" value="{{ form_dict['age_min'] }}"/> max <input type="text" name="age_max" value="{{ form_dict['age_max'] }}"/>
+<br/>
+Handedness
+<input type="radio" name="handedness" value="left" checked="{{ form_dict['handedness_left_checked'] }}"/> Left
+<input type="radio" name="handedness" value="right" checked="{{ form_dict['handedness_right_checked'] }}"/> Right
+<input type="radio" name="handedness" value="either" checked="{{ form_dict['handedness_either_checked'] }}"/> Either
+<br/>
+<input type="submit"/>
+</form>
+
+</body>
+
+</html>
