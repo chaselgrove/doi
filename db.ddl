@@ -21,3 +21,16 @@ CREATE TABLE image (doi TEXT PRIMARY KEY REFERENCES doi,
                     xnat_id TEXT NOT NULL UNIQUE, 
                     type VARCHAR(4) NOT NULL CHECK (type IN ('anat', 'seg')), 
                     FOREIGN KEY (project, subject) REFERENCES subject);
+
+CREATE TABLE collection (id TEXT PRIMARY KEY, 
+                         doi TEXT DEFAULT NULL REFERENCES doi);
+
+CREATE TABLE collection_image (collection TEXT REFERENCES collection, 
+                               image TEXT REFERENCES image, 
+                               PRIMARY KEY (collection, image));
+
+CREATE TABLE search (id TEXT PRIMARY KEY, 
+                     created TIMESTAMP WITH TIME ZONE NOT NULL, 
+                     initial_collection TEXT NOT NULL REFERENCES collection, 
+                     modified TIMESTAMP WITH TIME ZONE NOT NULL, 
+                     current_collection TEXT NOT NULL REFERENCES collection);
