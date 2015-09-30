@@ -4,8 +4,23 @@ import xml.dom.minidom
 import StringIO
 import csv
 import requests
+from ezid.xml_utils import xml_text
 
-def get_xnat_info(project, subject, experiment):
+subjects = {}
+
+def get_subjects(project):
+    if project not in subjects:
+        url = 'http://doi.virtualbrain.org/xnat/data/projects/%s/subjects?format=csv' % project
+        r = requests.get(url)
+        r = csv.reader(StringIO.StringIO(r.content))
+        header = r.next()
+        subjects[project] = []
+        for row in r:
+            row_dict = dict(zip(header, row))
+            subjects[project].append(row_dict['label'])
+    return subjects[project]
+
+def get_image_info(project, subject, experiment):
     """for the given project, subject, and experiment, returns a 2-tuple of:
 
         (experiment ID, N scan files, N scan file bytes), 
@@ -34,6 +49,28 @@ def get_xnat_info(project, subject, experiment):
     return ((experiment_id, n_scan_files, n_scan_bytes), 
             (assessor_id, n_assessor_files, n_assessor_bytes))
 
+def get_subject_info(project, subject):
+    """return (XNAT ID, gender, age, handedness) for an XNAT subject"""
+    url = 'http://doi.virtualbrain.org/xnat/data/projects/'
+    url += project
+    url += '/subjects/'
+    url += subject
+    url += '?format=xml'
+    r = requests.get(url)
+    doc = xml.dom.minidom.parseString(r.content)
+    els = doc.getElementsByTagName('xnat:Subject')
+    xnat_id = els[0].getAttribute('ID')
+    age_els = doc.getElementsByTagName('xnat:age')
+    age = xml_text(age_els[0])
+    gender_els = doc.getElementsByTagName('xnat:gender')
+    gender = xml_text(gender_els[0])
+    handedness_els = doc.getElementsByTagName('xnat:handedness')
+    if handedness_els:
+        handedness = xml_text(handedness_els[0])
+    else:
+        handedness = None
+    return (xnat_id, gender, age, handedness)
+
 def process_files(parent_el):
     n_files = 0
     n_bytes = 0
@@ -44,44 +81,38 @@ def process_files(parent_el):
         n_bytes += int(el.getAttribute('file_size'))
     return (n_files, n_bytes)
 
-def iteribsr():
-    for i in xrange(18):
-        subject = str(i+1)
-        experiment = '%s_MR' % subject
-        (scan_info, assessor_info) = get_xnat_info('ibsr', subject, experiment)
-        d = {'Subject': subject, 
-             'Type': 'Anatomical MR', 
-             'Sizes': ('%d files' % scan_info[1], '%d bytes' % scan_info[2]), 
-             'XNAT ID': scan_info[0]}
-        yield d
-        d = {'Subject': subject, 
-             'Type': 'Manual Segmentation', 
-             'Sizes': ('%d files' % assessor_info[1], 
-                      '%d bytes' % assessor_info[2]), 
-             'XNAT ID': assessor_info[0]}
+def iter_subjects(project):
+    for subject in get_subjects(project):
+        (xnat_id, gender, age, handedness) = get_subject_info(project, subject)
+        if gender in ('F', 'female'):
+            gender_norm = 'female'
+        elif gender in ('M', 'male'):
+            gender_norm = 'male'
+        else:
+            msg = 'gender %s for subject %s in %s' % (gender, subject, project)
+            raise ValueError(msg)
+        d = {'XNAT ID': xnat_id, 
+             'label': subject, 
+             'gender': gender_norm, 
+             'age': age, 
+             'handedness': handedness}
         yield d
     return
 
-def itercs():
-    url = 'http://doi.virtualbrain.org/xnat/data/projects/cs_schizbull08/subjects?format=csv'
-    r = requests.get(url)
-    r = csv.reader(StringIO.StringIO(r.content))
-    header = r.next()
-    subjects = []
-    for row in r:
-        row_dict = dict(zip(header, row))
-        subjects.append(row_dict['label'])
-    for subject in subjects:
+def iter_images(project):
+    for subject in get_subjects(project):
         experiment = '%s_MR' % subject
-        (scan_info, assessor_info) = get_xnat_info('cs_schizbull08', subject, experiment)
-        d = {'Subject': subject, 
-             'Type': 'Anatomical MR', 
-             'Sizes': ('%d files' % scan_info[1], '%d bytes' % scan_info[2]), 
+        (scan_info, assessor_info) = get_image_info(project, 
+                                                    subject, 
+                                                    experiment)
+        d = {'subject': subject, 
+             'type': 'Anatomical MR', 
+             'sizes': ('%d files' % scan_info[1], '%d bytes' % scan_info[2]), 
              'XNAT ID': scan_info[0]}
         yield d
-        d = {'Subject': subject, 
-             'Type': 'Manual Segmentation', 
-             'Sizes': ('%d files' % assessor_info[1], 
+        d = {'subject': subject, 
+             'type': 'Manual Segmentation', 
+             'sizes': ('%d files' % assessor_info[1], 
                       '%d bytes' % assessor_info[2]), 
              'XNAT ID': assessor_info[0]}
         yield d

@@ -3,11 +3,23 @@
 import sys
 import json
 import doi
+import doi.db
 import info
 
 test_flag = True
 
 base_lp_url = 'http://doi.virtualbrain.org'
+
+insert_subject_sql = """INSERT INTO subject (project, 
+                                             label, 
+                                             xnat_id, 
+                                             gender, 
+                                             age, 
+                                             handedness) 
+                        VALUES (%s, %s, %s, %s, %s, %s)"""
+
+insert_image_sql = """INSERT INTO image (doi, project, subject, xnat_id, type) 
+                      VALUES (%s, %s, %s, %s, %s)"""
 
 def create(md):
     """mint the DOI and update the landing page"""
@@ -35,9 +47,24 @@ def seg_url(project, id):
     url += project
     return url
 
-def create_images(project_code, project_name, project_doi, image_iterator):
+def create_subjects(project_code):
+    print 'subjects for %s' % project_code
+    with doi.db.DBCursor() as c:
+        for subject_info in info.iter_subjects(project_code):
+            print '    %s' % subject_info['label']
+            c.execute(insert_subject_sql, (project_code, 
+                                           subject_info['label'], 
+                                           subject_info['XNAT ID'], 
+                                           subject_info['gender'],
+                                           subject_info['age'],
+                                           subject_info['handedness']))
+            break
+    return
+
+def create_images(project_code, project_name, project_doi):
     images = []
-    for image_info in image_iterator():
+    print 'images for %s' % project_code
+    for image_info in info.iter_images(project_code):
         md = {}
         for key in ('creators', 
                     'publisher', 
@@ -47,26 +74,35 @@ def create_images(project_code, project_name, project_doi, image_iterator):
                     'geolocation'):
             if key in project_doi.metadata:
                 md[key] = project_doi.metadata[key]
-        if image_info['Type'] == 'Anatomical MR':
+        if image_info['type'] == 'Anatomical MR':
             md['resourcetype'] = 'Image/Structural MR'
             url = anat_url(project_code, image_info['XNAT ID'])
-        elif image_info['Type'] == 'Manual Segmentation':
+            db_type = 'anat'
+        elif image_info['type'] == 'Manual Segmentation':
             md['resourcetype'] = 'Image/Manual Segmentation'
             url = seg_url(project_code, image_info['XNAT ID'])
+            db_type = 'seg'
         else:
             assert False
         md['alternateidentifiers'] = (('URL', url), )
-        md['sizes'] = image_info['Sizes']
+        md['sizes'] = image_info['sizes']
         md['formats'] = ('NIfTI-1', )
-        md['title'] = '%s for %s subject %s' % (image_info['Type'], 
+        md['title'] = '%s for %s subject %s' % (image_info['type'], 
                                                 project_name, 
-                                                image_info['Subject'])
+                                                image_info['subject'])
         md['relatedidentifiers'] = ((project_doi.identifier, 
                                      'DOI', 
                                      'IsPartOf'), )
         image = create(md)
-        print '    image:', image.identifier
+        print '    %s' % image.identifier
         images.append(image)
+        with doi.db.DBCursor() as c:
+            c.execute(insert_image_sql, (image.identifier, 
+                                         project_code, 
+                                         image_info['subject'], 
+                                         image_info['XNAT ID'], 
+                                         db_type))
+        break
     md = project_doi.copy_metadata()
     if 'relatedidentifiers' not in md:
         md['relatedidentifiers'] = []
@@ -83,11 +119,19 @@ ibsr_md = json.load(open('ibsr.json'))
 ibsr = create(ibsr_md)
 print 'created IBSR:', ibsr.identifier
 
-create_images('ibsr', 'IBSR', ibsr, info.iteribsr)
+with doi.db.DBCursor() as c:
+    c.execute("INSERT INTO project (doi, xnat_id) VALUES (%s, %s)", 
+              (candi_share.identifier, 'cs_schizbull08'))
+    c.execute("INSERT INTO project (doi, xnat_id) VALUES (%s, %s)", 
+              (ibsr.identifier, 'ibsr'))
+
+create_subjects('cs_schizbull08')
+create_subjects('ibsr')
+
 create_images('cs_schizbull08', 
               'CANDI Share Schizophrenia Bulletin 2008', 
-              candi_share, 
-              info.itercs)
+              candi_share)
+create_images('ibsr', 'IBSR', ibsr)
 
 sys.exit(0)
 
