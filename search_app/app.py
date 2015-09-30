@@ -110,9 +110,7 @@ def parse_search(form):
         if age_max is None:
             error = 'min age without max age'
         else:
-            if age_min == age_max:
-                error = 'bad age range (min=max)'
-            elif age_min > age_max:
+            if age_min > age_max:
                 error = 'bad age range (min>max)'
             else:
                 rd['age_range'] = (age_min, age_max)
@@ -148,14 +146,23 @@ def post_search():
                                      post_url=flask.url_for('post_search'), 
                                      form_dict=res_dict, 
                                      error=res_dict['error'])
-    return flask.redirect(flask.url_for('search', search_id='abc'))
+    search = doi.search(res_dict['gender'], 
+                        res_dict['age_range'], 
+                        res_dict['handedness'])
+    return flask.redirect(flask.url_for('search', search_id=search.id))
 
 @app.route('/<search_id>', methods=['GET', 'POST'])
 def search(search_id):
     search_url = flask.url_for('search', search_id=search_id)
     if flask.request.method == 'GET':
+        try:
+            search = doi.get_search(search_id)
+        except ValueError:
+            flask.abort(404)
+        projects = doi.get_all_projects()
         return flask.render_template('search.tmpl', 
-                                     search_id=search_id, 
+                                     search=search, 
+                                     projects=projects, 
                                      post_url=search_url, 
                                      error=None)
     return flask.render_template('search.tmpl', 

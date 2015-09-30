@@ -34,4 +34,4 @@ CREATE TABLE search (id TEXT PRIMARY KEY,
                      t_created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), 
                      initial_collection TEXT NOT NULL REFERENCES collection, 
                      t_modified TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), 
-                     current_collection TEXT NOT NULL REFERENCES collection);
+                     collection TEXT NOT NULL REFERENCES collection);

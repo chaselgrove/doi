@@ -7,17 +7,32 @@
 <body>
 
 <p>
-This is result {{ result_id }}.
+This is a search, starting with {{ search.description }}.
 </p>
 
 {% if error %}
     {{ error }}
 {% endif %}
 
-<form action={{ post_url }} method="POST" >
-<input name="fail" type="checkbox" /> fail
-<input type="submit"/>
-</form>
+{% for project in projects %}
+    {{ project.xnat_id }}
+    {% for subject in project.subjects %}
+        {{ subject.label }}
+        {% for image in subject.images %}
+            {{ image.type }}
+            {% if search.collection.has_image(image) %}
+                yes
+            {% else %}
+                no
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endfor %}
+
+{# <form action={{ post_url }} method="POST" > #}
+{# <input name="fail" type="checkbox" /> fail #}
+{# <input type="submit"/> #}
+{# </form> #}
 
 </body>
 

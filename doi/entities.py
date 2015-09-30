@@ -15,18 +15,27 @@ _insert_collection_image_sql = """INSERT INTO collection_image (collection,
                                                                 image) 
                                   VALUES (%s, %s)"""
 
-_subject_images_sql = "SELECT * FROM image WHERE project = %s AND subject = %s"
+_subject_images_sql = """SELECT * 
+                           FROM image 
+                          WHERE project = %s 
+                            AND subject = %s 
+                          ORDER BY type"""
 
 _insert_search_sql = """INSERT INTO search (id, 
                                             description, 
                                             initial_collection, 
-                                            current_collection) 
-                        VALUES (%s, %s, %s)"""
+                                            collection) 
+                        VALUES (%s, %s, %s, %s)"""
 
 _update_search_sql = """UPDATE search 
                            SET t_modified = NOW(), 
-                               current_collection = %s 
+                               collection = %s 
                          WHERE id = %s"""
+
+_project_subjects_sql = """SELECT * 
+                             FROM subject 
+                            WHERE project = %s 
+                            ORDER BY label"""
 
 class _Project:
 
@@ -34,6 +43,7 @@ class _Project:
         self.identifier = d['doi']
         self.xnat_id = d['xnat_id']
         self._doi = None
+        self._subjects = None
         return
 
     @property
@@ -41,6 +51,19 @@ class _Project:
         if not self._doi:
             self._doi = DOI(self.identifier)
         return self._doi
+
+    @property
+    def subjects(self):
+        if not self._subjects:
+            self._subjects = []
+            with DBCursor() as c:
+                c.execute(_project_subjects_sql, (self.xnat_id, ))
+                cols = [ el[0] for el in c.description ]
+                for row in c:
+                    row_dict = dict(zip(cols, row))
+                    subject = _Subject(row_dict)
+                    self._subjects.append(subject)
+        return self._subjects
 
 class _Subject:
 
@@ -139,6 +162,14 @@ class _Collection:
                     self._images.append(_Image(row_dict))
         return self._images
 
+    def has_image(self, image):
+        """preferred over 'image in self.images' in case different objects 
+        refer to the same image"""
+        for im in self.images:
+            if image.doi == im.doi:
+                return True
+        return False
+
 class _Search:
 
     def __init__(self, d):
@@ -148,8 +179,8 @@ class _Search:
         self._initial_collection_id = d['initial_collection']
         self._initial_collection = None
         self.t_modified = d['t_modified']
-        self._current_collection_id = d['current_collection']
-        self._current_collection = None
+        self._collection_id = d['collection']
+        self._collection = None
         return
 
     @property
@@ -160,11 +191,11 @@ class _Search:
         return self._initial_collection
 
     @property
-    def current_collection(self):
-        if self._current_collection is None:
-            c = get_collection(self._current_collection_id)
-            self._current_collection = c
-        return self._current_collection
+    def collection(self):
+        if self._collection is None:
+            c = get_collection(self._collection_id)
+            self._collection = c
+        return self._collection
 
     def update(self, collection):
         if not isinstance(collection, _Collection):
@@ -173,8 +204,8 @@ class _Search:
             c.execute(_update_search_sql, (collection.id, self.id))
             c.execute("SELECT t_modified FROM search WHERE id = %s", 
                       (self.id, ))
-            self._current_collection_id = collection.id
-            self._current_collection = None
+            self._collection_id = collection.id
+            self._collection = None
             self.t_modified = c.fetchone()[0]
         return
 
@@ -304,7 +335,7 @@ def search(gender, age_range, handedness):
                 msg = 'age_range must be None or contain two integers'
                 raise TypeError(msg)
     images = []
-    for subject in get_all_subjects:
+    for subject in get_all_subjects():
         if gender == 'female' and subject.gender != 'female':
             continue
         if gender == 'male' and subject.gender != 'male':
@@ -338,5 +369,16 @@ def search(gender, age_range, handedness):
         c.execute(_insert_search_sql, params)
     s = get_search(search_id)
     return s
+
+def get_all_projects():
+    projects = []
+    with DBCursor() as c:
+        c.execute("SELECT * FROM project ORDER BY xnat_id")
+        cols = [ el[0] for el in c.description ]
+        for row in c:
+            row_dict = dict(zip(cols, row))
+            project = _Project(row_dict)
+            projects.append(project)
+    return projects
 
 # eof
