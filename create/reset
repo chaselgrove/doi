@@ -1,0 +1,14 @@
+#!/bin/sh
+
+psql -h localhost -U doi << EOF
+DELETE FROM collection_image;
+DELETE FROM collection;
+DELETE FROM image;
+DELETE FROM subject;
+DELETE FROM project;
+DELETE FROM doi;
+EOF
+
+exit $?
+
+# eof
