@@ -30,7 +30,8 @@ CREATE TABLE collection_image (collection TEXT REFERENCES collection,
                                PRIMARY KEY (collection, image));
 
 CREATE TABLE search (id TEXT PRIMARY KEY, 
-                     created TIMESTAMP WITH TIME ZONE NOT NULL, 
+                     description TEXT NOT NULL, 
+                     t_created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), 
                      initial_collection TEXT NOT NULL REFERENCES collection, 
-                     modified TIMESTAMP WITH TIME ZONE NOT NULL, 
+                     t_modified TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), 
                      current_collection TEXT NOT NULL REFERENCES collection);

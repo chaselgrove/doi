@@ -1,18 +1,32 @@
 """DOI project entities"""
 
 import hashlib
+import random
 from .doi import DOI
 from .db import DBCursor
 
-_images_in_collection_sql = """SELECT * 
-                                 FROM image 
-                                WHERE doi IN (SELECT image 
-                                                FROM collection_image 
-                                                WHERE collection = %s)"""
+_collection_images_sql = """SELECT * 
+                              FROM image 
+                             WHERE doi IN (SELECT image 
+                                             FROM collection_image 
+                                             WHERE collection = %s)"""
 
 _insert_collection_image_sql = """INSERT INTO collection_image (collection, 
                                                                 image) 
                                   VALUES (%s, %s)"""
+
+_subject_images_sql = "SELECT * FROM image WHERE project = %s AND subject = %s"
+
+_insert_search_sql = """INSERT INTO search (id, 
+                                            description, 
+                                            initial_collection, 
+                                            current_collection) 
+                        VALUES (%s, %s, %s)"""
+
+_update_search_sql = """UPDATE search 
+                           SET t_modified = NOW(), 
+                               current_collection = %s 
+                         WHERE id = %s"""
 
 class _Project:
 
@@ -38,6 +52,7 @@ class _Subject:
         self.age = d['age']
         self.handedness = d['handedness']
         self._project = None
+        self._images = None
         return
 
     @property
@@ -45,6 +60,20 @@ class _Subject:
         if not self._project:
             self._project = get_project_by_xnat_id(self._project_xnat_id)
         return self._project
+
+    @property
+    def images(self):
+        if self._images is None:
+            self._images = []
+            with DBCursor() as c:
+                c.execute(_subject_images_sql, 
+                          (self._project_xnat_id, self.label))
+                cols = [ el[0] for el in c.description ]
+                for row in c:
+                    row_dict = dict(zip(cols, row))
+                    image = _Image(row_dict)
+                    self._images.append(image)
+        return self._images
 
 class _Image:
 
@@ -103,18 +132,60 @@ class _Collection:
         if self._images is None:
             self._images = []
             with DBCursor() as c:
-                c.execute(_images_in_collection_sql, (self.id, ))
+                c.execute(_collection_images_sql, (self.id, ))
                 cols = [ el[0] for el in c.description ]
                 for row in c:
                     row_dict = dict(zip(cols, row))
                     self._images.append(_Image(row_dict))
         return self._images
 
+class _Search:
+
+    def __init__(self, d):
+        self.id = d['id']
+        self.description = d['description']
+        self.t_created = d['t_created']
+        self._initial_collection_id = d['initial_collection']
+        self._initial_collection = None
+        self.t_modified = d['t_modified']
+        self._current_collection_id = d['current_collection']
+        self._current_collection = None
+        return
+
+    @property
+    def initial_collection(self):
+        if self._initial_collection is None:
+            c = get_collection(self._initial_collection_id)
+            self._initial_collection = c
+        return self._initial_collection
+
+    @property
+    def current_collection(self):
+        if self._current_collection is None:
+            c = get_collection(self._current_collection_id)
+            self._current_collection = c
+        return self._current_collection
+
+    def update(self, collection):
+        if not isinstance(collection, _Collection):
+            raise TypeError('collection is not a collection object')
+        with DBCursor() as c:
+            c.execute(_update_search_sql, (collection.id, self.id))
+            c.execute("SELECT t_modified FROM search WHERE id = %s", 
+                      (self.id, ))
+            self._current_collection_id = collection.id
+            self._current_collection = None
+            self.t_modified = c.fetchone()[0]
+        return
+
 def create_identifier(s):
     if not isinstance(s, basestring):
         raise TypeError('argument must be a string')
     h = hashlib.sha256(s)
     return h.hexdigest()[:8]
+
+def random_identifier():
+    return create_identifier(str(random.random()))
 
 def get_project(identifier):
     if not isinstance(identifier, basestring):
@@ -151,6 +222,15 @@ def get_subject(project, label):
         cols = [ el[0] for el in c.description ]
         d = dict(zip(cols, c.fetchone()))
     return _Subject(d)
+
+def get_all_subjects():
+    subjects = []
+    with DBCursor() as c:
+        c.execute("SELECT * FROM subject")
+        cols = [ el[0] for el in c.description ]
+        d = dict(zip(cols, c.fetchone()))
+        subjects.append(_Subject(d))
+    return subjects
 
 def get_image(identifier):
     if not isinstance(identifier, basestring):
@@ -197,5 +277,66 @@ def create_collection(images):
             c.execute(_insert_collection_image_sql, (identifier, image_id))
     collection = get_collection(identifier)
     return collection
+
+def get_search(id):
+    if not isinstance(id, basestring):
+        raise TypeError('search ID must be a string')
+    with DBCursor() as c:
+        c.execute("SELECT * FROM search WHERE id = %s", (id, ))
+        if c.rowcount == 0:
+            raise ValueError('search %s not found' % id)
+        cols = [ el[0] for el in c.description ]
+        d = dict(zip(cols, c.fetchone()))
+    return _Search(d)
+
+def search(gender, age_range, handedness):
+    if gender not in ('female', 'male', 'either'):
+        raise ValueError('bad value for gender')
+    if handedness not in ('left', 'right', 'either'):
+        raise ValueError('bad value for handedness')
+    if age_range is not None:
+        if not isinstance(age_range, (tuple, list)):
+            raise TypeError('age_range must be None, a tuple, or a list')
+        if len(age_range) != 2:
+            raise TypeError('age_range must be None or contain two values')
+        for v in age_range:
+            if not isinstance(v, int):
+                msg = 'age_range must be None or contain two integers'
+                raise TypeError(msg)
+    images = []
+    for subject in get_all_subjects:
+        if gender == 'female' and subject.gender != 'female':
+            continue
+        if gender == 'male' and subject.gender != 'male':
+            continue
+        if handedness == 'left' and subject.handedness != 'left':
+            continue
+        if handedness == 'right' and subject.handedness != 'right':
+            continue
+        if age_range:
+            if subject.age < age_range[0] or subject.age > age_range[1]:
+                continue
+        images.extend(subject.images)
+    description_parts = []
+    if gender == 'either':
+        description_parts.append('either gender')
+    else:
+        description_parts.append(gender)
+    if not age_range:
+        description_parts.append('any age')
+    else:
+        description_parts.append('%d <= age <= %d' % tuple(age_range))
+    if handedness == 'either':
+        description_parts.append('either handedness')
+    else:
+        description_parts.append(handedness)
+    description = ', '.join(description_parts)
+    collection = create_collection(images)
+    search_id = random_identifier()
+    with DBCursor() as c:
+        params = (search_id, description, collection.id, collection.id)
+        c.execute(_insert_search_sql, params)
+    s = get_search(search_id)
+    return s
 
 # eof
