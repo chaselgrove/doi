@@ -166,7 +166,7 @@ class _Collection:
         """preferred over 'image in self.images' in case different objects 
         refer to the same image"""
         for im in self.images:
-            if image.doi == im.doi:
+            if image.doi.identifier == im.doi.identifier:
                 return True
         return False
 
