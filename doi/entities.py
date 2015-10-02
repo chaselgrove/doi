@@ -209,6 +209,10 @@ class _Search:
             self.t_modified = c.fetchone()[0]
         return
 
+    def modified(self):
+        """report if the initial search has been modified"""
+        return self._collection_id != self._initial_collection_id
+
 def create_identifier(s):
     if not isinstance(s, basestring):
         raise TypeError('argument must be a string')
