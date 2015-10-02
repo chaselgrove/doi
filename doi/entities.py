@@ -345,6 +345,8 @@ def search(gender, age_range, handedness):
         if handedness == 'right' and subject.handedness != 'right':
             continue
         if age_range:
+            if subject.age is None:
+                conintue
             if subject.age < age_range[0] or subject.age > age_range[1]:
                 continue
         images.extend(subject.images)

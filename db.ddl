@@ -10,7 +10,7 @@ CREATE TABLE subject (project TEXT REFERENCES project(xnat_id),
                       xnat_id TEXT NOT NULL UNIQUE, 
                       gender VARCHAR(6) NOT NULL 
                              CHECK (gender IN ('female', 'male')), 
-                      age INTEGER NOT NULL, 
+                      age INTEGER, 
                       handedness VARCHAR(5) 
                                  CHECK (handedness IN ('left', 'right')), 
                       PRIMARY KEY (project, label));

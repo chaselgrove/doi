@@ -71,7 +71,10 @@ def get_subject_info(project, subject):
     els = doc.getElementsByTagName('xnat:Subject')
     xnat_id = els[0].getAttribute('ID')
     age_els = doc.getElementsByTagName('xnat:age')
-    age = xml_text(age_els[0])
+    if age_els:
+        age = xml_text(age_els[0])
+    else:
+        age = None
     gender_els = doc.getElementsByTagName('xnat:gender')
     gender = xml_text(gender_els[0])
     handedness_els = doc.getElementsByTagName('xnat:handedness')
