@@ -6,6 +6,13 @@ import csv
 import requests
 from ezid.xml_utils import xml_text
 
+# restrict created data to certain subjects (project code, subject label)
+# subject_subset = None for all subjects
+subjects_subset = (('cs_schizbull08', 'BPDwPsy_066'), 
+                   ('cs_schizbull08', 'HC_001'), 
+                   ('ibsr', '14'), 
+                   ('ibsr', '8'))
+
 subjects = {}
 
 def get_subjects(project):
@@ -17,6 +24,9 @@ def get_subjects(project):
         subjects[project] = []
         for row in r:
             row_dict = dict(zip(header, row))
+            if subjects_subset:
+                if (project, row_dict['label']) not in subjects_subset:
+                    continue
             subjects[project].append(row_dict['label'])
     return subjects[project]
 

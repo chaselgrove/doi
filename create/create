@@ -58,7 +58,6 @@ def create_subjects(project_code):
                                            subject_info['gender'],
                                            subject_info['age'],
                                            subject_info['handedness']))
-            break
     return
 
 def create_images(project_code, project_name, project_doi):
@@ -102,7 +101,6 @@ def create_images(project_code, project_name, project_doi):
                                          image_info['subject'], 
                                          image_info['XNAT ID'], 
                                          db_type))
-        break
     md = project_doi.copy_metadata()
     if 'relatedidentifiers' not in md:
         md['relatedidentifiers'] = []
