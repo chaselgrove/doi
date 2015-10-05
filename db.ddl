@@ -18,6 +18,7 @@ CREATE TABLE subject (project TEXT REFERENCES project(xnat_id),
 CREATE TABLE image (doi TEXT PRIMARY KEY REFERENCES doi, 
                     project TEXT NOT NULL, 
                     subject TEXT NOT NULL, 
+                    xnat_experiment_id TEXT NOT NULL, 
                     xnat_id TEXT NOT NULL UNIQUE, 
                     type VARCHAR(4) NOT NULL CHECK (type IN ('anat', 'seg')), 
                     FOREIGN KEY (project, subject) REFERENCES subject);

@@ -21,8 +21,13 @@ insert_subject_sql = """INSERT INTO subject (project,
                                              handedness) 
                         VALUES (%s, %s, %s, %s, %s, %s)"""
 
-insert_image_sql = """INSERT INTO image (doi, project, subject, xnat_id, type) 
-                      VALUES (%s, %s, %s, %s, %s)"""
+insert_image_sql = """INSERT INTO image (doi, 
+                                         project, 
+                                         subject, 
+                                         xnat_experiment_id, 
+                                         xnat_id, 
+                                         type) 
+                      VALUES (%s, %s, %s, %s, %s, %s)"""
 
 def create(md):
     """mint the DOI and update the landing page"""
@@ -157,6 +162,7 @@ def create_images(project_code, project_name, project_doi):
             c.execute(insert_image_sql, (image.identifier, 
                                          project_code, 
                                          image_info['subject'], 
+                                         image_info['XNAT experiment ID'], 
                                          image_info['XNAT ID'], 
                                          db_type))
         xml_doi_fct(project_code, image_info['subject'], image.identifier)

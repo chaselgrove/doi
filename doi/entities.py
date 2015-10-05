@@ -107,6 +107,7 @@ class _Image:
         self._subject_label = d['subject']
         self._subject = None
         self.type = d['type']
+        self.xnat_experiment_id = d['xnat_experiment_id']
         self.xnat_id = d['xnat_id']
         self._doi = None
         return

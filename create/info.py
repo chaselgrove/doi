@@ -124,17 +124,21 @@ def iter_images(project):
         (scan_info, assessor_info) = get_image_info(project, 
                                                     subject, 
                                                     experiment)
+        experiment_id = scan_info[0]
         d = {'subject': subject, 
              'type': 'Anatomical MR', 
              'format': format, 
-             'sizes': ('%d files' % scan_info[1], '%d bytes' % scan_info[2]), 
-             'XNAT ID': scan_info[0]}
+             'sizes': ('%d files' % scan_info[1], 
+                       '%d bytes' % scan_info[2]), 
+             'XNAT experiment ID': experiment_id, 
+             'XNAT ID': experiment_id}
         yield d
         d = {'subject': subject, 
              'type': 'Manual Segmentation', 
              'format': format, 
              'sizes': ('%d files' % assessor_info[1], 
                       '%d bytes' % assessor_info[2]), 
+             'XNAT experiment ID': experiment_id, 
              'XNAT ID': assessor_info[0]}
         yield d
     return
