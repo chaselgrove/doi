@@ -8,26 +8,71 @@
 
 <p>
 This is a search, starting with {{ search.description }}.
+{% if search.modified() %}
+    The search results have been modified.
+{% endif %}
 </p>
 
 {% if error %}
     {{ error }}
 {% endif %}
 
+<table>
+    <tr>
+        <th>project</th>
+        <th>subject</th>
+        <th>gender</th>
+        <th>age</th>
+        <th>handedness</th>
+        <th>scan</th>
+    </tr>
 {% for project in projects %}
-    {{ project.xnat_id }}
     {% for subject in project.subjects %}
-        {{ subject.label }}
         {% for image in subject.images %}
-            {{ image.type }}
-            {% if search.collection.has_image(image) %}
-                yes
-            {% else %}
-                no
-            {% endif %}
+            <tr>
+                <td>{{ project.xnat_id }}</td>
+                <td>{{ subject.label }}</td>
+                <td>{{ subject.gender }}</td>
+                {% if subject.age is none %}
+                    <td></td>
+                {% else %}
+                    <td>{{ subject.age }}</td>
+                {% endif %}
+                {% if subject.handedness is none %}
+                    <td></td>
+                {% else %}
+                    <td>{{ subject.handedness }}</td>
+                {% endif %}
+                <td>{{ image.type }}
+                    {% if search.collection.has_image(image) %}
+                        yes
+                    {% else %}
+                        no
+                    {% endif %}
+                </td>
         {% endfor %}
     {% endfor %}
 {% endfor %}
+
+<form action="http://doi.virtualbrain.org/xnat/app/action/DownloadSessionsAction2" method="POST">
+
+<input type="hidden" name="assessors" value="ir:CandiShareSegData" />
+<input type="hidden" name="download_option" value="applet" />
+<input type="hidden" name="eventSubmit_doPerform" value="Submit" />
+<input type="hidden" name="scan_format" value="NIfTI" />
+<input type="hidden" name="scan_format" value="ANALYZE" />
+<input type="hidden" name="scan_type" value="anat" />
+<input type="hidden" name="simplified" value="true" />
+{% for image in search.collection.images %}
+    <input type="hidden" name="sessions" value="{{ image.xnat_experiment_id }}" />
+{% endfor %}
+
+Note: The download package may contain more data than requested.
+
+<input type="submit"/ value="Download">
+
+</form>
+
 
 {# <form action={{ post_url }} method="POST" > #}
 {# <input name="fail" type="checkbox" /> fail #}
