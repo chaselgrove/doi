@@ -23,7 +23,17 @@ This is a search, starting with {{ search.description }}.
 
 <form action="{{ post_url }}" method="POST">
 
-<input type="submit" value="Update" />
+Publication PubMed ID: <input type="text" name="pubmed_id" />
+Publication DOI: <input type="text" name="pub_doi" />
+Authors: <textarea name="authors"></textarea>
+Funder: <input type="text" name="funder" />
+Description: <textarea name="description"></textarea>
+<input type="submit" name="submit" value="Tag" />
+</form>
+
+<form action="{{ post_url }}" method="POST">
+
+<input type="submit" name="submit" value="Update" />
 
 <table>
     <tr>
@@ -66,7 +76,7 @@ This is a search, starting with {{ search.description }}.
     {% endfor %}
 {% endfor %}
 
-<input type="submit" value="Update" />
+<input type="submit" name="submit" value="Update" />
 
 </form>
 

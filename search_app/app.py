@@ -123,6 +123,10 @@ def parse_search(form):
 
 app = flask.Flask(__name__)
 
+@app.errorhandler(400)
+def not_found(error):
+    return (flask.render_template('400.tmpl'), 400)
+
 @app.errorhandler(404)
 def not_found(error):
     return (flask.render_template('404.tmpl'), 404)
@@ -161,18 +165,23 @@ def search(search_id):
     projects = doi.get_all_projects()
     if flask.request.method == 'GET':
         return flask.render_template('search.tmpl', 
-                                     search=search, 
-                                     projects=projects, 
-                                     post_url=search_url, 
-                                     error=None)
-    excludes = []
-    includes = []
-    for name in flask.request.form.keys():
-        if name.startswith('exclude_'):
-            excludes.append(doi.get_image(name[8:]))
-        if name.startswith('include_'):
-            includes.append(doi.get_image(name[8:]))
-    search.refine(excludes, includes)
+                                    search=search, 
+                                    projects=projects, 
+                                    post_url=search_url, 
+                                    error=None)
+    if flask.request.form['submit'] == 'Update':
+        excludes = []
+        includes = []
+        for name in flask.request.form.keys():
+            if name.startswith('exclude_'):
+                excludes.append(doi.get_image(name[8:]))
+            if name.startswith('include_'):
+                includes.append(doi.get_image(name[8:]))
+        search.refine(excludes, includes)
+    elif flask.request.form['submit'] == 'Tag':
+        pass
+    else:
+        flask.abort(400)
     return flask.render_template('search.tmpl', 
                                  search=search, 
                                  projects=projects, 
