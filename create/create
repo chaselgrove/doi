@@ -1,7 +1,10 @@
 #!/usr/bin/python
 
 import sys
+import os
+import xml.dom.minidom
 import json
+import requests
 import doi
 import doi.db
 import info
@@ -47,6 +50,59 @@ def seg_url(project, id):
     url += project
     return url
 
+def set_anat_doi(project_code, subject, identifier):
+    experiment = '%s_MR' % subject
+    url = 'http://localhost:8080/xnat/data/projects/'
+    url += project_code
+    url += '/subjects/'
+    url += subject
+    url += '/experiments/'
+    url += experiment
+    url += '/scans/anat'
+    r = requests.get(url + '?format=xml')
+    doc = xml.dom.minidom.parseString(r.content)
+    update_doi(doc, 'xnat:MRScan', identifier)
+    data = doc.toxml()
+    auth = (os.environ['XNAT_USER'], os.environ['XNAT_PASSWORD'])
+    requests.put(url + '?inbody=true', data=data, auth=auth)
+    return
+    
+def set_seg_doi(project_code, subject, identifier):
+    experiment = '%s_MR' % subject
+    segmentation = '%s_seg' % experiment
+    url = 'http://localhost:8080/xnat/data/projects/'
+    url += project_code
+    url += '/subjects/'
+    url += subject
+    url += '/experiments/'
+    url += experiment
+    url += '/assessors/'
+    url += segmentation
+    r = requests.get(url + '?format=xml')
+    doc = xml.dom.minidom.parseString(r.content)
+    update_doi(doc, 'ir:CandiShareSeg', identifier)
+    data = doc.toxml()
+    auth = (os.environ['XNAT_USER'], os.environ['XNAT_PASSWORD'])
+    requests.put(url + '?inbody=true', data=data, auth=auth)
+    return
+
+def update_doi(doc, base_tag, identifier):
+    """set or update ir:DOI"""
+    els = doc.getElementsByTagName('ir:DOI')
+    if els:
+        doi_el = els[0]
+        children = tuple(doi_el.childNodes)
+        for el in children:
+            doi_el.removeChild(el)
+    else:
+        els = doc.getElementsByTagName(base_tag)
+        assert len(els) == 1
+        cs_el = els[0]
+        doi_el = doc.createElement('ir:DOI')
+        cs_el.appendChild(doi_el)
+    doi_el.appendChild(doc.createTextNode(identifier))
+    return
+    
 def create_subjects(project_code):
     print 'subjects for %s' % project_code
     with doi.db.DBCursor() as c:
@@ -77,10 +133,12 @@ def create_images(project_code, project_name, project_doi):
             md['resourcetype'] = 'Image/Structural MR'
             url = anat_url(project_code, image_info['XNAT ID'])
             db_type = 'anat'
+            xml_doi_fct = set_anat_doi
         elif image_info['type'] == 'Manual Segmentation':
             md['resourcetype'] = 'Image/Manual Segmentation'
             url = seg_url(project_code, image_info['XNAT ID'])
             db_type = 'seg'
+            xml_doi_fct = set_seg_doi
         else:
             assert False
         md['alternateidentifiers'] = (('URL', url), )
@@ -101,6 +159,7 @@ def create_images(project_code, project_name, project_doi):
                                          image_info['subject'], 
                                          image_info['XNAT ID'], 
                                          db_type))
+        xml_doi_fct(project_code, image_info['subject'], image.identifier)
     md = project_doi.copy_metadata()
     if 'relatedidentifiers' not in md:
         md['relatedidentifiers'] = []
