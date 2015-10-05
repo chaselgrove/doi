@@ -14,8 +14,16 @@ This is a search, starting with {{ search.description }}.
 </p>
 
 {% if error %}
-    {{ error }}
+    error is {{ error }} and done
 {% endif %}
+
+{% if feedback %}
+    {{ feedback }}
+{% endif %}
+
+<form action="{{ post_url }}" method="POST">
+
+<input type="submit" value="Update" />
 
 <table>
     <tr>
@@ -25,6 +33,8 @@ This is a search, starting with {{ search.description }}.
         <th>age</th>
         <th>handedness</th>
         <th>scan</th>
+        <th></th>
+        <th></th>
     </tr>
 {% for project in projects %}
     {% for subject in project.subjects %}
@@ -43,16 +53,22 @@ This is a search, starting with {{ search.description }}.
                 {% else %}
                     <td>{{ subject.handedness }}</td>
                 {% endif %}
-                <td>{{ image.type }}
-                    {% if search.collection.has_image(image) %}
-                        yes
-                    {% else %}
-                        no
-                    {% endif %}
+                <td>{{ image.type }}</td>
+                {% if search.collection.has_image(image) %}
+                    <td></td>
+                    <td><input type="checkbox" name="exclude_{{ image.identifier }}" value="true" />Exclude</td>
+                {% else %}
+                    <td><input type="checkbox" name="include_{{ image.identifier }}" value="true" />Include</td>
+                    <td></td>
+                {% endif %}
                 </td>
         {% endfor %}
     {% endfor %}
 {% endfor %}
+
+<input type="submit" value="Update" />
+
+</form>
 
 <form action="http://doi.virtualbrain.org/xnat/app/action/DownloadSessionsAction2" method="POST">
 

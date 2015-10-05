@@ -198,7 +198,7 @@ class _Search:
             self._collection = c
         return self._collection
 
-    def update(self, collection):
+    def set(self, collection):
         if not isinstance(collection, _Collection):
             raise TypeError('collection is not a collection object')
         with DBCursor() as c:
@@ -213,6 +213,39 @@ class _Search:
     def modified(self):
         """report if the initial search has been modified"""
         return self._collection_id != self._initial_collection_id
+
+    def refine(self, remove, add):
+        """refine the search results with lists of images"""
+        if remove is None:
+            remove = []
+        if add is None:
+            add = []
+        for image in remove:
+            if not isinstance(image, _Image):
+                raise TypeError('non-image passed to update()')
+        for image in add:
+            if not isinstance(image, _Image):
+                raise TypeError('non-image passed to update()')
+        # add and remove based on identifiers (since the passed image objects 
+        # may differ from the stored image objects)
+        images = {}
+        for image in self.collection.images:
+            images[image.identifier] = image
+        for image in add:
+            if image.identifier in images:
+                msg = 'image %s is already in search results' % image.identifier
+                raise ValueError(msg)
+        for image in remove:
+            if image.identifier not in images:
+                msg = 'image %s is not in search results' % image.identifier
+                raise ValueError(msg)
+        for image in remove:
+            del images[image.identifier]
+        for image in add:
+            images[image.identifier] = image
+        collection = create_collection(images.values())
+        self.set(collection)
+        return
 
 def create_identifier(s):
     if not isinstance(s, basestring):

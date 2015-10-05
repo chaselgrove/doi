@@ -154,21 +154,30 @@ def post_search():
 @app.route('/<search_id>', methods=['GET', 'POST'])
 def search(search_id):
     search_url = flask.url_for('search', search_id=search_id)
+    try:
+        search = doi.get_search(search_id)
+    except ValueError:
+        flask.abort(404)
+    projects = doi.get_all_projects()
     if flask.request.method == 'GET':
-        try:
-            search = doi.get_search(search_id)
-        except ValueError:
-            flask.abort(404)
-        projects = doi.get_all_projects()
         return flask.render_template('search.tmpl', 
                                      search=search, 
                                      projects=projects, 
                                      post_url=search_url, 
                                      error=None)
+    excludes = []
+    includes = []
+    for name in flask.request.form.keys():
+        if name.startswith('exclude_'):
+            excludes.append(doi.get_image(name[8:]))
+        if name.startswith('include_'):
+            includes.append(doi.get_image(name[8:]))
+    search.refine(excludes, includes)
     return flask.render_template('search.tmpl', 
-                                 search_id=search_id, 
+                                 search=search, 
+                                 projects=projects, 
                                  post_url=search_url, 
-                                 error='post')
+                                 error=None)
 
 if __name__ == '__main__':
     app.run(debug=True)
