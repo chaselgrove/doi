@@ -264,8 +264,9 @@ def get_all_subjects():
     with DBCursor() as c:
         c.execute("SELECT * FROM subject")
         cols = [ el[0] for el in c.description ]
-        d = dict(zip(cols, c.fetchone()))
-        subjects.append(_Subject(d))
+        for row in c:
+            d = dict(zip(cols, row))
+            subjects.append(_Subject(d))
     return subjects
 
 def get_image(identifier):
