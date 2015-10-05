@@ -113,6 +113,12 @@ def iter_subjects(project):
     return
 
 def iter_images(project):
+    if project == 'cs_schizbull08':
+        format = 'NIfTI-1'
+    elif project == 'ibsr':
+        format = 'ANALYZE'
+    else:
+        raise ValueError('bad project')
     for subject in get_subjects(project):
         experiment = '%s_MR' % subject
         (scan_info, assessor_info) = get_image_info(project, 
@@ -120,11 +126,13 @@ def iter_images(project):
                                                     experiment)
         d = {'subject': subject, 
              'type': 'Anatomical MR', 
+             'format': format, 
              'sizes': ('%d files' % scan_info[1], '%d bytes' % scan_info[2]), 
              'XNAT ID': scan_info[0]}
         yield d
         d = {'subject': subject, 
              'type': 'Manual Segmentation', 
+             'format': format, 
              'sizes': ('%d files' % assessor_info[1], 
                       '%d bytes' % assessor_info[2]), 
              'XNAT ID': assessor_info[0]}

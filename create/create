@@ -143,7 +143,7 @@ def create_images(project_code, project_name, project_doi):
             assert False
         md['alternateidentifiers'] = (('URL', url), )
         md['sizes'] = image_info['sizes']
-        md['formats'] = ('NIfTI-1', )
+        md['formats'] = (image_info['format'], )
         md['title'] = '%s for %s subject %s' % (image_info['type'], 
                                                 project_name, 
                                                 image_info['subject'])
