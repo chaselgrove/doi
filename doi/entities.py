@@ -2,8 +2,11 @@
 
 import hashlib
 import random
-from .doi import DOI
+import datetime
+from .doi import DOI, mint
 from .db import DBCursor
+
+test_flag = True
 
 _collection_images_sql = """SELECT * 
                               FROM image 
@@ -148,7 +151,7 @@ class _Collection:
         if self._doi is None:
             return self._doi
         if isinstance(self._doi, basestring):
-            self._doi = doi.DOI(self._doi)
+            self._doi = DOI(self._doi)
         return self._doi
 
     @property
@@ -170,6 +173,74 @@ class _Collection:
             if image.doi.identifier == im.doi.identifier:
                 return True
         return False
+
+    def tag(self, 
+            description, 
+            pubmed_id=None, 
+            publication_doi=None, 
+            authors=None, 
+            funder=None):
+        """tag the collection with a DOI"""
+        if self._doi is not None:
+            raise ValueError('collection has already been tagged')
+        md = {'creators': ['UMass/CANDI DOI project'], 
+              'title': '(:tba)', 
+              'publisher': 'UMass/CANDI DOI project', 
+              'publicationyear': str(datetime.datetime.now().year), 
+              'resourcetype': 'Dataset/Imaging Data'}
+        d = mint(md, test_flag)
+        md = d.copy_metadata()
+        md['title'] = 'Image collection %s' % d.identifier
+        d.update_metadata(md)
+        self._doi = d.identifier
+        with DBCursor() as c:
+            c.execute("UPDATE collection SET doi = %s WHERE id = %s", 
+                      (self._doi, self.id))
+        print 'updating'
+        self.update_metadata(description, 
+                             pubmed_id, 
+                             publication_doi, 
+                             authors, 
+                             funder)
+#'relatedidentifiers
+#'sizes
+#'formats
+        return
+
+    def update_metadata(self, 
+                        description, 
+                        pubmed_id=None, 
+                        publication_doi=None, 
+                        authors=None, 
+                        funder=None):
+        """update the collection DOI"""
+        if self._doi is None:
+            raise ValueError('collection has not been tagged')
+        md = self.doi.copy_metadata()
+        if 'descriptions' not in md:
+            md['descriptions'] = []
+        md['descriptions'].append(('Other', description))
+        if pubmed_id:
+            if 'relatedidentifiers' not in md:
+                md['relatedidentifiers'] = []
+            ri = (pubmed_id, 'PMID', 'IsDocumentedBy')
+            md['relatedidentifiers'].append(ri)
+        if publication_doi:
+            if 'relatedidentifiers' not in md:
+                md['relatedidentifiers'] = []
+            ri = (publication_doi, 'DOI', 'IsDocumentedBy')
+            md['relatedidentifiers'].append(ri)
+        if authors:
+            if 'creators' not in md:
+                md['creators'] = []
+            for author in authors:
+                md['creators'].append((author, None))
+        if funder:
+            if 'contributors' not in md:
+                md['contributors'] = []
+            md['contributors'].append(('Funder', funder, None))
+        self.doi.update_metadata(md)
+        return
 
 class _Search:
 

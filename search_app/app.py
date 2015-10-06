@@ -1,8 +1,12 @@
 """web application for DOI landing pages"""
 
 import sys
+import re
 import flask
+import requests
 import doi
+
+pubmed_re = re.compile('^\d+$')
 
 form_dict_defaults = {'gender_female_checked': '', 
                       'gender_male_checked': '', 
@@ -12,6 +16,12 @@ form_dict_defaults = {'gender_female_checked': '',
                       'handedness_either_checked': 'checked', 
                       'age_min': '', 
                       'age_max': ''}
+
+tag_dict_defaults = {'pubmed_id': '', 
+                     'publication_doi': '', 
+                     'authors': '', 
+                     'funder': '', 
+                     'description': ''}
 
 def parse_search(form):
     """parse a search form
@@ -121,6 +131,69 @@ def parse_search(form):
     rd['status'] = 200
     return rd
 
+def parse_tag(form):
+    """parse a tag form
+
+    returns a dictionary with the following keys:
+
+        status: 200 or 400
+
+        if 200:
+
+            pubmed_id
+            publication_doi
+            authors
+            funder
+            description
+
+        if 400, all 200 fields including:
+
+            error
+    """
+    rd = dict(tag_dict_defaults)
+    if form.has_key('pubmed_id'):
+        rd['pubmed_id'] = form['pubmed_id'].strip()
+    if form.has_key('publication_doi'):
+        rd['publication_doi'] = form['publication_doi'].strip()
+        if rd['publication_doi']:
+            if not rd['publication_doi'].startswith('doi:'):
+                rd['publication_doi'] = 'doi:' + rd['publication_doi']
+    if form.has_key('authors'):
+        rd['authors'] = []
+        for author in form['authors'].split('\n'):
+            author = author.strip()
+            if not author:
+                continue
+            rd['authors'].append(author)
+    if form.has_key('funder'):
+        rd['funder'] = form['funder'].strip()
+    if form.has_key('description'):
+        rd['description'] = form['description']
+    if not rd['description']:
+        rd['error'] = 'no description given'
+        rd['status'] = 400
+        return rd
+    if rd['pubmed_id']:
+        if not pubmed_re.search(rd['pubmed_id']):
+            rd['error'] = 'bad PubMed ID'
+            rd['status'] = 400
+            return rd
+        url = 'http://www.ncbi.nlm.nih.gov/pubmed/%s' % rd['pubmed_id']
+        r = requests.head(url)
+        if r.status_code != 200:
+            rd['error'] = 'PubMed ID not found'
+            rd['status'] = 400
+            return rd
+    if rd['publication_doi']:
+        url = 'http://dx.doi.org/%s' % rd['publication_doi']
+        r = requests.head(url)
+        if r.status_code not in (200, 303):
+            rd['error'] = 'publication DOI not found'
+            rd['status'] = 400
+            return rd
+    rd['status'] = 200
+    return rd
+
 app = flask.Flask(__name__)
 
 @app.errorhandler(400)
@@ -163,11 +236,13 @@ def search(search_id):
     except ValueError:
         flask.abort(404)
     projects = doi.get_all_projects()
+    res_dict = tag_dict_defaults
     if flask.request.method == 'GET':
         return flask.render_template('search.tmpl', 
                                     search=search, 
                                     projects=projects, 
                                     post_url=search_url, 
+                                    tag_form_dict=res_dict, 
                                     error=None)
     if flask.request.form['submit'] == 'Update':
         excludes = []
@@ -178,15 +253,48 @@ def search(search_id):
             if name.startswith('include_'):
                 includes.append(doi.get_image(name[8:]))
         search.refine(excludes, includes)
+        error = None
     elif flask.request.form['submit'] == 'Tag':
-        pass
-    else:
-        flask.abort(400)
+        res_dict = parse_tag(flask.request.form)
+        if res_dict['status'] == 200:
+            if res_dict['pubmed_id']:
+                pubmed_id = res_dict['pubmed_id']
+            else:
+                pubmed_id = None
+            if res_dict['publication_doi']:
+                publication_doi = res_dict['publication_doi']
+            else:
+                publication_doi = None
+            if res_dict['authors']:
+                authors = res_dict['authors']
+            else:
+                authors = None
+            if res_dict['funder']:
+                funder = res_dict['funder']
+            else:
+                funder = None
+            if search.collection._doi:
+                search.collection.update_metadata(res_dict['description'], 
+                                                  pubmed_id, 
+                                                  publication_doi, 
+                                                  authors, 
+                                                  funder)
+            else:
+                search.collection.tag(res_dict['description'], 
+                                      pubmed_id, 
+                                      publication_doi, 
+                                      authors, 
+                                      funder)
+            fmt = 'http://doi.virtualbrain.org/lp/%s'
+            url = fmt % search.collection.doi.identifier
+            return flask.redirect(url)
+            error = res_dict['error']
     return flask.render_template('search.tmpl', 
                                  search=search, 
                                  projects=projects, 
                                  post_url=search_url, 
-                                 error=None)
+                                 tag_form_dict=res_dict, 
+                                 error=error)
 
 if __name__ == '__main__':
     app.run(debug=True)
