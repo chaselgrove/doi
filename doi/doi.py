@@ -5,6 +5,8 @@ import ezid
 from .config import umms_doi_prefix, umms_auth, test_auth
 from . import db
 
+base_lp_url = 'http://doi.virtualbrain.org'
+
 select_sql = "SELECT metadata, landing_page FROM doi WHERE identifier = %s"
 
 insert_sql = """INSERT INTO doi (identifier, metadata, landing_page) 
@@ -54,19 +56,27 @@ class DOI(ezid.DOI):
                       (self.landing_page, self.identifier))
         return
 
-def mint(landing_page, metadata, test=False):
+def mint(metadata, test=False):
+    """mint a DOI using the test or UMMS prefix and set the landing page 
+    to the virtualbrain landing page for the DOI
+
+    returns the DOI object, not the identifier
+    """
     if test:
         dp = ezid.test_prefix
         auth = test_auth
     else:
         dp = umms_doi_prefix
         auth = umms_auth
-    identifier = ezid.mint(landing_page, metadata, dp, auth)
+    identifier = ezid.mint(base_lp_url, metadata, dp, auth)
     md2 = ezid.validate_metadata(metadata)
     with db.DBCursor() as c:
-        params = (identifier, json.dumps(md2), landing_page)
+        params = (identifier, json.dumps(md2), base_lp_url)
         c.execute(insert_sql, params)
-    return identifier
+    d = DOI(identifier)
+    landing_page = '%s/lp/%s' % (base_lp_url, d.identifier)
+    d.update_landing_page(landing_page)
+    return d
 
 def get_all_dois():
     with db.DBCursor() as c:

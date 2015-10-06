@@ -11,8 +11,6 @@ import info
 
 test_flag = True
 
-base_lp_url = 'http://doi.virtualbrain.org'
-
 insert_subject_sql = """INSERT INTO subject (project, 
                                              label, 
                                              xnat_id, 
@@ -28,12 +26,6 @@ insert_image_sql = """INSERT INTO image (doi,
                                          xnat_id, 
                                          type) 
                       VALUES (%s, %s, %s, %s, %s, %s)"""
-
-def create(md):
-    """mint the DOI and update the landing page"""
-    d = doi.DOI(doi.mint(base_lp_url, md, test_flag))
-    d.update_landing_page('%s/lp/%s' % (base_lp_url, d.identifier))
-    return d
 
 def anat_url(project, id):
     url = 'http://doi.virtualbrain.org/xnat/app/action/'
@@ -155,7 +147,7 @@ def create_images(project_code, project_name, project_doi):
         md['relatedidentifiers'] = ((project_doi.identifier, 
                                      'DOI', 
                                      'IsPartOf'), )
-        image = create(md)
+        image = doi.mint(md, test_flag)
         print '    %s' % image.identifier
         images.append(image)
         with doi.db.DBCursor() as c:
@@ -175,11 +167,11 @@ def create_images(project_code, project_name, project_doi):
     print 'updated %s with images' % project_code
 
 candi_share_md = json.load(open('candi_share.json'))
-candi_share = create(candi_share_md)
+candi_share = doi.mint(candi_share_md, test_flag)
 print 'created CANDI Share:', candi_share.identifier
 
 ibsr_md = json.load(open('ibsr.json'))
-ibsr = create(ibsr_md)
+ibsr = doi.mint(ibsr_md, test_flag)
 print 'created IBSR:', ibsr.identifier
 
 with doi.db.DBCursor() as c:
