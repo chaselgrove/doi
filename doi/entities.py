@@ -183,11 +183,13 @@ class _Collection:
         """tag the collection with a DOI"""
         if self._doi is not None:
             raise ValueError('collection has already been tagged')
+        url = 'http://doi.virtualbrain.org/search/reconstitute/%s' % self.id
         md = {'creators': ['UMass/CANDI DOI project'], 
               'title': '(:tba)', 
               'publisher': 'UMass/CANDI DOI project', 
               'publicationyear': str(datetime.datetime.now().year), 
-              'resourcetype': 'Dataset/Imaging Data'}
+              'resourcetype': 'Dataset/Imaging Data', 
+              'alternateidentifiers': [('URL', url)]}
         d = mint(md, test_flag)
         md = d.copy_metadata()
         md['title'] = 'Image collection %s' % d.identifier
@@ -231,10 +233,10 @@ class _Collection:
             ri = (publication_doi, 'DOI', 'IsDocumentedBy')
             md['relatedidentifiers'].append(ri)
         if authors:
-            if 'creators' not in md:
-                md['creators'] = []
+            if 'contributors' not in md:
+                md['contributors'] = []
             for author in authors:
-                md['creators'].append((author, None))
+                md['contributors'].append(('RelatedPerson', author, None))
         if funder:
             if 'contributors' not in md:
                 md['contributors'] = []
@@ -476,6 +478,20 @@ def search(gender, age_range, handedness):
     description = ', '.join(description_parts)
     collection = create_collection(images)
     search_id = random_identifier()
+    with DBCursor() as c:
+        params = (search_id, description, collection.id, collection.id)
+        c.execute(_insert_search_sql, params)
+    s = get_search(search_id)
+    return s
+
+def search_from_collection(collection):
+    if not isinstance(collection, _Collection):
+        raise TypeError('collection must be a _Collection instance')
+    search_id = random_identifier()
+    if collection.doi:
+        description = 'collection %s' % collection.doi.identifier
+    else:
+        description = 'pre-existing collection'
     with DBCursor() as c:
         params = (search_id, description, collection.id, collection.id)
         c.execute(_insert_search_sql, params)

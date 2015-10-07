@@ -288,13 +288,22 @@ def search(search_id):
             fmt = 'http://doi.virtualbrain.org/lp/%s'
             url = fmt % search.collection.doi.identifier
             return flask.redirect(url)
-            error = res_dict['error']
+        error = res_dict['error']
     return flask.render_template('search.tmpl', 
                                  search=search, 
                                  projects=projects, 
                                  post_url=search_url, 
                                  tag_form_dict=res_dict, 
                                  error=error)
+
+@app.route('/reconstitute/<collection_id>')
+def reconstitute(collection_id):
+    try:
+        collection = doi.get_collection(collection_id)
+    except ValueError:
+        flask.abort(404)
+    s = doi.search_from_collection(collection)
+    return flask.redirect(flask.url_for('search', search_id=s.id))
 
 if __name__ == '__main__':
     app.run(debug=True)
