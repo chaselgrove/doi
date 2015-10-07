@@ -3,10 +3,14 @@
 import hashlib
 import random
 import datetime
+import re
 from .doi import DOI, mint
 from .db import DBCursor
 
 test_flag = True
+
+bytes_re = re.compile('^(\d+) bytes$')
+files_re = re.compile('^(\d+) files$')
 
 _collection_images_sql = """SELECT * 
                               FROM image 
@@ -67,6 +71,17 @@ class _Project:
                     subject = _Subject(row_dict)
                     self._subjects.append(subject)
         return self._subjects
+
+    def note_collection(self, collection):
+        if not isinstance(collection, _Collection):
+            raise TypeError('collection must be a _Collection instance')
+        md = self.doi.copy_metadata()
+        if 'relatedidentifiers' not in md:
+            md['relatedidentifiers'] = []
+        t = (collection.doi.identifier, 'DOI', 'IsSourceOf')
+        md['relatedidentifiers'].append(t)
+        self.doi.update_metadata(md)
+        return
 
 class _Subject:
 
@@ -134,6 +149,17 @@ class _Image:
             self._doi = DOI(self.identifier)
         return self._doi
 
+    def note_collection(self, collection):
+        if not isinstance(collection, _Collection):
+            raise TypeError('collection must be a _Collection instance')
+        md = self.doi.copy_metadata()
+        if 'relatedidentifiers' not in md:
+            md['relatedidentifiers'] = []
+        t = (collection.doi.identifier, 'DOI', 'IsPartOf')
+        md['relatedidentifiers'].append(t)
+        self.doi.update_metadata(md)
+        return
+
 class _Collection:
 
     def __init__(self, d):
@@ -190,23 +216,47 @@ class _Collection:
               'publicationyear': str(datetime.datetime.now().year), 
               'resourcetype': 'Dataset/Imaging Data', 
               'alternateidentifiers': [('URL', url)]}
-        d = mint(md, test_flag)
-        md = d.copy_metadata()
-        md['title'] = 'Image collection %s' % d.identifier
-        d.update_metadata(md)
-        self._doi = d.identifier
+        self._doi = mint(md, test_flag)
+        md = self.doi.copy_metadata()
+        md['title'] = 'Image collection %s' % self.doi.identifier
+        projects = {}
+        md['relatedidentifiers'] = []
+        for image in self.images:
+            if image.project.identifier not in projects:
+                projects[image.project.identifier] = image.project
+            t = (image.identifier, 'DOI', 'HasPart')
+            md['relatedidentifiers'].append(t)
+            image.note_collection(self)
+        for (identifier, project) in projects.iteritems():
+            t = (identifier, 'DOI', 'IsDerivedFrom')
+            md['relatedidentifiers'].append(t)
+            project.note_collection(self)
         with DBCursor() as c:
             c.execute("UPDATE collection SET doi = %s WHERE id = %s", 
-                      (self._doi, self.id))
-        print 'updating'
+                      (self.doi.identifier, self.id))
+        formats = set()
+        bytes = 0
+        files = 0
+        for image in self.images:
+            for format in image.doi.metadata['formats']:
+                formats.add(format)
+            for size in image.doi.metadata['sizes']:
+                mo = bytes_re.search(size)
+                if mo:
+                    bytes += int(mo.groups()[0])
+                mo = files_re.search(size)
+                if mo:
+                    files += int(mo.groups()[0])
+        md['formats'] = list(formats)
+        md['sizes'] = ['%d bytes' % bytes, 
+                       '%d files' % files, 
+                       '%d images' % len(self.images)]
+        self.doi.update_metadata(md)
         self.update_metadata(description, 
                              pubmed_id, 
                              publication_doi, 
                              authors, 
                              funder)
-#'relatedidentifiers
-#'sizes
-#'formats
         return
 
     def update_metadata(self, 
