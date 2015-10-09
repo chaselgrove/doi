@@ -1,6 +1,7 @@
 CREATE TABLE doi (identifier TEXT NOT NULL PRIMARY KEY, 
                   metadata TEXT NOT NULL, 
-                  landing_page TEXT NOT NULL);
+                  landing_page TEXT NOT NULL, 
+                  up_to_date BOOLEAN NOT NULL);
 
 CREATE TABLE project (doi TEXT PRIMARY KEY REFERENCES doi, 
                       xnat_id TEXT NOT NULL UNIQUE);

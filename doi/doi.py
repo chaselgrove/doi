@@ -9,10 +9,16 @@ base_lp_url = 'http://doi.virtualbrain.org'
 
 select_sql = "SELECT metadata, landing_page FROM doi WHERE identifier = %s"
 
-insert_sql = """INSERT INTO doi (identifier, metadata, landing_page) 
-                VALUES (%s, %s, %s)"""
+insert_sql = """INSERT INTO doi (identifier, 
+                                 metadata, 
+                                 landing_page, 
+                                 up_to_date) 
+                VALUES (%s, %s, %s, %s)"""
 
-update_metadata_sql = "UPDATE doi SET metadata = %s WHERE identifier = %s"
+update_metadata_sql = """UPDATE doi 
+                            SET metadata = %s, 
+                                up_to_date = %s 
+                          WHERE identifier = %s"""
 
 update_landing_page_sql = """UPDATE doi 
                                 SET landing_page = %s 
@@ -42,7 +48,7 @@ class DOI(ezid.DOI):
         ezid.DOI.update_metadata(self, metadata, auth)
         with db.DBCursor() as c:
             c.execute(update_metadata_sql, 
-                      (json.dumps(metadata), self.identifier))
+                      (json.dumps(metadata), True, self.identifier))
         return
 
     def update_landing_page(self, landing_page):
@@ -71,7 +77,7 @@ def mint(metadata, test=False):
     identifier = ezid.mint(base_lp_url, metadata, dp, auth)
     md2 = ezid.validate_metadata(metadata)
     with db.DBCursor() as c:
-        params = (identifier, json.dumps(md2), base_lp_url)
+        params = (identifier, json.dumps(md2), base_lp_url, True)
         c.execute(insert_sql, params)
     d = DOI(identifier)
     landing_page = '%s/lp/%s' % (base_lp_url, d.identifier)
