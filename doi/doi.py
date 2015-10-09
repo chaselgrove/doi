@@ -7,7 +7,9 @@ from . import db
 
 base_lp_url = 'http://doi.virtualbrain.org'
 
-select_sql = "SELECT metadata, landing_page FROM doi WHERE identifier = %s"
+select_sql = """SELECT metadata, landing_page, up_to_date 
+                  FROM doi 
+                 WHERE identifier = %s"""
 
 insert_sql = """INSERT INTO doi (identifier, 
                                  metadata, 
@@ -38,17 +40,34 @@ class DOI(ezid.DOI):
             row = c.fetchone()
             self.metadata = json.loads(row[0])
             self.landing_page = row[1]
+            self.up_to_date = row[2]
         return
 
-    def update_metadata(self, metadata):
+    def sync_metadata(self):
+        """sync EZID with the local metadata"""
         if self.identifier.startswith(umms_doi_prefix):
             auth = umms_auth
         else:
             auth = test_auth
-        ezid.DOI.update_metadata(self, metadata, auth)
+        ezid.DOI.update_metadata(self, self.metadata, auth)
         with db.DBCursor() as c:
-            c.execute(update_metadata_sql, 
-                      (json.dumps(metadata), True, self.identifier))
+            c.execute("UPDATE doi SET up_to_date = TRUE WHERE identifier = %s", 
+                      (self.identifier, ))
+        self.up_to_date = True
+        return
+
+    def update_metadata(self, metadata, update_flag=True):
+        """update_flag tells whether to update EZID with the metadata 
+        (otherwise this will be picked up later by a separate updater)
+        """
+        md2 = ezid.validate_metadata(metadata)
+        with db.DBCursor() as c:
+            params = (json.dumps(md2), False, self.identifier)
+            c.execute(update_metadata_sql, params)
+            self.up_to_date = False
+        self.metadata = md2
+        if update_flag:
+            self.sync_metadata()
         return
 
     def update_landing_page(self, landing_page):
