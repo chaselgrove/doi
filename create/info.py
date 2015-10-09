@@ -12,6 +12,7 @@ subjects_subset = (('cs_schizbull08', 'BPDwPsy_066'),
                    ('cs_schizbull08', 'HC_001'), 
                    ('ibsr', '14'), 
                    ('ibsr', '8'))
+subjects_subset = None
 
 subjects = {}
 
