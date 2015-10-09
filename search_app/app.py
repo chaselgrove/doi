@@ -284,7 +284,8 @@ def search(search_id):
                                       pubmed_id, 
                                       publication_doi, 
                                       authors, 
-                                      funder)
+                                      funder, 
+                                      update_others_flag=False)
             fmt = 'http://doi.virtualbrain.org/lp/%s'
             url = fmt % search.collection.doi.identifier
             return flask.redirect(url)

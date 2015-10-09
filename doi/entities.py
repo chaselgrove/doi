@@ -72,7 +72,7 @@ class _Project:
                     self._subjects.append(subject)
         return self._subjects
 
-    def note_collection(self, collection):
+    def note_collection(self, collection, update_flag=True):
         if not isinstance(collection, _Collection):
             raise TypeError('collection must be a _Collection instance')
         md = self.doi.copy_metadata()
@@ -80,7 +80,7 @@ class _Project:
             md['relatedidentifiers'] = []
         t = (collection.doi.identifier, 'DOI', 'IsSourceOf')
         md['relatedidentifiers'].append(t)
-        self.doi.update_metadata(md)
+        self.doi.update_metadata(md, update_flag)
         return
 
 class _Subject:
@@ -149,7 +149,7 @@ class _Image:
             self._doi = DOI(self.identifier)
         return self._doi
 
-    def note_collection(self, collection):
+    def note_collection(self, collection, update_flag=True):
         if not isinstance(collection, _Collection):
             raise TypeError('collection must be a _Collection instance')
         md = self.doi.copy_metadata()
@@ -157,7 +157,7 @@ class _Image:
             md['relatedidentifiers'] = []
         t = (collection.doi.identifier, 'DOI', 'IsPartOf')
         md['relatedidentifiers'].append(t)
-        self.doi.update_metadata(md)
+        self.doi.update_metadata(md, update_flag)
         return
 
 class _Collection:
@@ -205,7 +205,8 @@ class _Collection:
             pubmed_id=None, 
             publication_doi=None, 
             authors=None, 
-            funder=None):
+            funder=None, 
+            update_others_flag=True):
         """tag the collection with a DOI"""
         if self._doi is not None:
             raise ValueError('collection has already been tagged')
@@ -226,11 +227,11 @@ class _Collection:
                 projects[image.project.identifier] = image.project
             t = (image.identifier, 'DOI', 'HasPart')
             md['relatedidentifiers'].append(t)
-            image.note_collection(self)
+            image.note_collection(self, update_others_flag)
         for (identifier, project) in projects.iteritems():
             t = (identifier, 'DOI', 'IsDerivedFrom')
             md['relatedidentifiers'].append(t)
-            project.note_collection(self)
+            project.note_collection(self, update_others_flag)
         with DBCursor() as c:
             c.execute("UPDATE collection SET doi = %s WHERE id = %s", 
                       (self.doi.identifier, self.id))
