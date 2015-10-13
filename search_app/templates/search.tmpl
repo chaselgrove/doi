@@ -1,10 +1,8 @@
-<html>
+{% extends "base.tmpl" %}
 
-<head>
-<title>CANDI DOIs</title>
-</head>
+{% block title %}Search{% endblock %}
 
-<body>
+{% block body %}
 
 <p>
 This is a search, starting with {{ search.description }}.
@@ -29,6 +27,25 @@ Authors: <textarea name="authors">{{ '\n'.join(tag_form_dict['authors']) }}</tex
 Funder: <input type="text" name="funder" value="{{ tag_form_dict['funder'] }}" />
 Description: <textarea name="description">{{ tag_form_dict['description'] }}</textarea>
 <input type="submit" name="submit" value="Tag" />
+</form>
+
+<form action="http://doi.virtualbrain.org/xnat/app/action/DownloadSessionsAction2" method="POST">
+
+<input type="hidden" name="assessors" value="ir:CandiShareSegData" />
+<input type="hidden" name="download_option" value="applet" />
+<input type="hidden" name="eventSubmit_doPerform" value="Submit" />
+<input type="hidden" name="scan_format" value="NIfTI" />
+<input type="hidden" name="scan_format" value="ANALYZE" />
+<input type="hidden" name="scan_type" value="anat" />
+<input type="hidden" name="simplified" value="true" />
+{% for image in search.collection.images %}
+    <input type="hidden" name="sessions" value="{{ image.xnat_experiment_id }}" />
+{% endfor %}
+
+Note: The download package may contain more data than requested.
+
+<input type="submit"/ value="Download">
+
 </form>
 
 <form action="{{ post_url }}" method="POST">
@@ -75,34 +92,15 @@ Description: <textarea name="description">{{ tag_form_dict['description'] }}</te
         {% endfor %}
     {% endfor %}
 {% endfor %}
+</table>
 
 <input type="submit" name="submit" value="Update" />
 
 </form>
 
-<form action="http://doi.virtualbrain.org/xnat/app/action/DownloadSessionsAction2" method="POST">
-
-<input type="hidden" name="assessors" value="ir:CandiShareSegData" />
-<input type="hidden" name="download_option" value="applet" />
-<input type="hidden" name="eventSubmit_doPerform" value="Submit" />
-<input type="hidden" name="scan_format" value="NIfTI" />
-<input type="hidden" name="scan_format" value="ANALYZE" />
-<input type="hidden" name="scan_type" value="anat" />
-<input type="hidden" name="simplified" value="true" />
-{% for image in search.collection.images %}
-    <input type="hidden" name="sessions" value="{{ image.xnat_experiment_id }}" />
-{% endfor %}
-
-Note: The download package may contain more data than requested.
-
-<input type="submit"/ value="Download">
-
-</form>
 
 
 {# hit the logo to get the xnat jsessionid (needed to pass to the download page) #}
 <img src="http://doi.virtualbrain.org/xnat/images/logo.png" width="1" height="1" />
 
-</body>
-
-</html>
+{% endblock %}

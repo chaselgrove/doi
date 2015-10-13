@@ -1,0 +1,15 @@
+body {
+    font-family: "Helvetica", sans-serif;
+    font-size: 12px;
+}
+
+table {
+    border: 1px solid #000;
+    border-collapse: collapse;
+}
+
+table td, table th {
+    border: 1px solid #000;
+}
+
+/* eof */

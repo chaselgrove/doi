@@ -1,10 +1,8 @@
-<html>
+{% extends "base.tmpl" %}
 
-<head>
-<title>CANDI DOIs</title>
-</head>
+{% block title %}CANDI DOIs{% endblock %}
 
-<body>
+{% block body %}
 
 {% if error %}
     Error: {{ error }}
@@ -26,6 +24,4 @@ Handedness
 <input type="submit"/>
 </form>
 
-</body>
-
-</html>
+{% endblock %}
