@@ -509,7 +509,7 @@ def search(gender, age_range, handedness):
             continue
         if age_range:
             if subject.age is None:
-                conintue
+                continue
             if subject.age < age_range[0] or subject.age > age_range[1]:
                 continue
         images.extend(subject.images)
