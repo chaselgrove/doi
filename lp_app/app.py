@@ -26,10 +26,22 @@ def index():
 
 @app.route('/<path:identifier>')
 def landing_page(identifier):
+    if identifier.startswith('xml/'):
+        identifier = identifier[4:]
+        force_xml = True
+    else:
+        force_xml = False
     try:
         entity = doi.get_entity(identifier)
     except ValueError:
         flask.abort(404)
+    if force_xml:
+        mt = 'application/xml'
+    else:
+        mt = flask.request.accept_mimetypes.best_match(['text/html', 
+                                                        'application/xml'])
+        if mt is None:
+            flask.abort(406)
     if isinstance(entity, doi.entities._Project):
         template = 'project.tmpl'
     elif isinstance(entity, doi.entities._Image):
@@ -38,14 +50,10 @@ def landing_page(identifier):
         template = 'collection.tmpl'
     else:
         flask.abort(500)
-    mt = flask.request.accept_mimetypes.best_match(['text/html', 
-                                                    'application/xml'])
-    if mt is None:
-        flask.abort(406)
     if mt == 'text/html':
         data = flask.render_template(template, entity=entity)
     else:
-        data = d.xml
+        data = entity.doi.xml
     resp = flask.Response(data, mimetype=mt)
     return resp
 
