@@ -51,7 +51,9 @@ def landing_page(identifier):
     else:
         flask.abort(500)
     if mt == 'text/html':
-        data = flask.render_template(template, entity=entity)
+        xml_url = flask.url_for('landing_page', 
+                                identifier='xml/%s' % identifier)
+        data = flask.render_template(template, entity=entity, xml_url=xml_url)
     else:
         data = entity.doi.xml
     resp = flask.Response(data, mimetype=mt)
