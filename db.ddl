@@ -37,3 +37,8 @@ CREATE TABLE search (id TEXT PRIMARY KEY,
                      initial_collection TEXT NOT NULL REFERENCES collection, 
                      t_modified TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), 
                      collection TEXT NOT NULL REFERENCES collection);
+
+CREATE VIEW entity 
+         AS SELECT doi, 'project' AS type FROM project 
+            UNION SELECT doi, 'image' AS type FROM image 
+            UNION SELECT doi, 'collection' AS type FROM collection;

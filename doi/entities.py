@@ -560,4 +560,20 @@ def get_all_projects():
             projects.append(project)
     return projects
 
+def get_entity(identifier):
+    if not isinstance(identifier, basestring):
+        raise TypeError('project identifier must be a string')
+    with DBCursor() as c:
+        c.execute("SELECT type FROM entity WHERE doi = %s", (identifier, ))
+        if c.rowcount == 0:
+            raise ValueErro('identifier %s not found' % identifier)
+        entity_type = c.fetchone()[0]
+    if entity_type == 'project':
+        return get_project(identifier)
+    if entity_type == 'image':
+        return get_image(identifier)
+    if entity_type == 'collection':
+        return get_collection(identifier)
+    raise ValueError('unknown entity type "%s"' % entity_type)
+
 # eof
