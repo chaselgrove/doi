@@ -76,6 +76,59 @@ class _Entity:
     def publicationyear(self):
         return self.doi.metadata['publicationyear']
 
+    @property
+    def resourcetype(self):
+        return self.doi.metadata['resourcetype']
+
+    def link(self):
+        if 'alternateidentifiers' not in self.doi.metadata:
+            return None
+        for (type, identifier) in self.doi.metadata:
+            if type == 'URL':
+                return identifier
+        return None
+
+    @property
+    def sizes(self):
+        if 'sizes' not in self.doi.metadata:
+            return []
+        return self.doi.metadata['sizes']
+
+    @property
+    def relatedidentifiers(self):
+        if 'relatedidentifiers' not in self.doi.metadata:
+            return {}
+        d = {}
+        for t in self.doi.metadata['relatedidentifiers']:
+            (identifier, type, relation) = t
+            d.setdefault(relation, [])
+            d[relation].append((type, identifier))
+        return d
+
+    @property
+    def version(self):
+        if 'version' not in self.doi.metadata:
+            return None
+        return self.doi.metadata['version']
+
+    @property
+    def rights(self):
+        if 'rights' not in self.doi.metadata:
+            return None
+        return self.doi.metadata['rights'][0]
+
+    @property
+    def descriptions(self):
+        if 'descriptions' not in self.doi.metadata:
+            return []
+        return self.doi.metadata['descriptions']
+
+    @property
+    def geolocations(self):
+        if 'geolocations' not in self.doi.metadata:
+            return []
+        return self.doi.metadata['geolocations']
+
 class _Project(_Entity):
 
     def __init__(self, d):
@@ -96,6 +149,22 @@ class _Project(_Entity):
                     subject = _Subject(row_dict)
                     self._subjects.append(subject)
         return self._subjects
+
+    @property
+    def contributors(self):
+        if 'contributors' not in self.doi.metadata:
+            return {}
+        d = {}
+        for (type, name, affiliation) in self.doi.metadata['contributors']:
+            d.setdefault(type, [])
+            d[type].append((name, affiliation))
+        return d
+
+    @property
+    def formats(self):
+        if 'formats' not in self.doi.metadata:
+            return []
+        return self.doi.metadata['formats']
 
     def note_collection(self, collection, update_flag=True):
         if not isinstance(collection, _Collection):
@@ -168,40 +237,10 @@ class _Image(_Entity):
         return self._project
 
     @property
-    def sizes(self):
-        if 'sizes' not in self.doi.metadata:
-            return []
-        return self.doi.metadata['sizes']
-
-    @property
     def format(self):
         if 'formats' not in self.doi.metadata:
             return []
         return self.doi.metadata['formats'][0]
-
-    @property
-    def version(self):
-        if 'version' not in self.doi.metadata:
-            return None
-        return self.doi.metadata['version']
-
-    @property
-    def rights(self):
-        if 'rights' not in self.doi.metadata:
-            return None
-        return self.doi.metadata['rights'][0]
-
-    @property
-    def resourcetype(self):
-        return self.doi.metadata['resourcetype']
-
-    def link(self):
-        if 'alternateidentifiers' not in self.doi.metadata:
-            return None
-        for (type, identifier) in self.doi.metadata:
-            if type == 'URL':
-                return identifier
-        return None
 
     def note_collection(self, collection, update_flag=True):
         if not isinstance(collection, _Collection):
@@ -622,7 +661,7 @@ def get_entity(identifier):
     with DBCursor() as c:
         c.execute("SELECT type FROM entity WHERE doi = %s", (identifier, ))
         if c.rowcount == 0:
-            raise ValueErro('identifier %s not found' % identifier)
+            raise ValueError('identifier %s not found' % identifier)
         entity_type = c.fetchone()[0]
     if entity_type == 'project':
         return get_project(identifier)
