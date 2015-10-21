@@ -44,20 +44,45 @@ _project_subjects_sql = """SELECT *
                             WHERE project = %s 
                             ORDER BY label"""
 
-class _Project:
+class _Entity:
 
     def __init__(self, d):
         self.identifier = d['doi']
-        self.xnat_id = d['xnat_id']
         self._doi = None
-        self._subjects = None
         return
 
     @property
     def doi(self):
+        # this can be the case for collections
+        if self.identifier is None:
+            return None
         if not self._doi:
             self._doi = DOI(self.identifier)
         return self._doi
+
+    @property
+    def title(self):
+        return self.doi.metadata['title']
+
+    @property
+    def creators(self):
+        return self.doi.metadata['creators']
+
+    @property
+    def publisher(self):
+        return self.doi.metadata['publisher']
+
+    @property
+    def publicationyear(self):
+        return self.doi.metadata['publicationyear']
+
+class _Project(_Entity):
+
+    def __init__(self, d):
+        _Entity.__init__(self, d)
+        self.xnat_id = d['xnat_id']
+        self._subjects = None
+        return
 
     @property
     def subjects(self):
@@ -116,10 +141,10 @@ class _Subject:
                     self._images.append(image)
         return self._images
 
-class _Image:
+class _Image(_Entity):
 
     def __init__(self, d):
-        self.identifier = d['doi']
+        _Entity.__init__(self, d)
         self._project_xnat_id = d['project']
         self._project = None
         self._subject_label = d['subject']
@@ -127,24 +152,7 @@ class _Image:
         self.type = d['type']
         self.xnat_experiment_id = d['xnat_experiment_id']
         self.xnat_id = d['xnat_id']
-        self._doi = None
         return
-
-    @property
-    def title(self):
-        return self.doi.metadata['title']
-
-    @property
-    def creators(self):
-        return self.doi.metadata['creators']
-
-    @property
-    def publisher(self):
-        return self.doi.metadata['publisher']
-
-    @property
-    def publicationyear(self):
-        return self.doi.metadata['publicationyear']
 
     @property
     def subject(self):
@@ -158,12 +166,6 @@ class _Image:
         if not self._project:
             self._project = get_project_by_xnat_id(self._project_xnat_id)
         return self._project
-
-    @property
-    def doi(self):
-        if not self._doi:
-            self._doi = DOI(self.identifier)
-        return self._doi
 
     @property
     def sizes(self):
@@ -212,25 +214,16 @@ class _Image:
         self.doi.update_metadata(md, update_flag)
         return
 
-class _Collection:
+class _Collection(_Entity):
 
     def __init__(self, d):
+        _Entity.__init__(self, d)
         # a DOI may not be assigned to a collection, so we have a unique ID 
         # and then a DOI which may or may not have a value
         self.id = d['id']
         self._doi = d['doi']
         self._images = None
         return
-
-    @property
-    def doi(self):
-        # return None if no DOI is assigned; the resolve the DOI to a DOI 
-        # object if we need to
-        if self._doi is None:
-            return self._doi
-        if isinstance(self._doi, basestring):
-            self._doi = DOI(self._doi)
-        return self._doi
 
     @property
     def images(self):
