@@ -84,7 +84,7 @@ class _Entity:
     def link(self):
         if 'alternateidentifiers' not in self.doi.metadata:
             return None
-        for (type, identifier) in self.doi.metadata:
+        for (type, identifier) in self.doi.metadata['alternateidentifiers']:
             if type == 'URL':
                 return identifier
         return None
