@@ -131,6 +131,22 @@ class _Image:
         return
 
     @property
+    def title(self):
+        return self.doi.metadata['title']
+
+    @property
+    def creators(self):
+        return self.doi.metadata['creators']
+
+    @property
+    def publisher(self):
+        return self.doi.metadata['publisher']
+
+    @property
+    def publicationyear(self):
+        return self.doi.metadata['publicationyear']
+
+    @property
     def subject(self):
         if not self._subject:
             self._subject = get_subject(self._project_xnat_id, 
@@ -148,6 +164,42 @@ class _Image:
         if not self._doi:
             self._doi = DOI(self.identifier)
         return self._doi
+
+    @property
+    def sizes(self):
+        if 'sizes' not in self.doi.metadata:
+            return []
+        return self.doi.metadata['sizes']
+
+    @property
+    def format(self):
+        if 'formats' not in self.doi.metadata:
+            return []
+        return self.doi.metadata['formats'][0]
+
+    @property
+    def version(self):
+        if 'version' not in self.doi.metadata:
+            return None
+        return self.doi.metadata['version']
+
+    @property
+    def rights(self):
+        if 'rights' not in self.doi.metadata:
+            return None
+        return self.doi.metadata['rights'][0]
+
+    @property
+    def resourcetype(self):
+        return self.doi.metadata['resourcetype']
+
+    def link(self):
+        if 'alternateidentifiers' not in self.doi.metadata:
+            return None
+        for (type, identifier) in self.doi.metadata:
+            if type == 'URL':
+                return identifier
+        return None
 
     def note_collection(self, collection, update_flag=True):
         if not isinstance(collection, _Collection):
