@@ -41,4 +41,6 @@ CREATE TABLE search (id TEXT PRIMARY KEY,
 CREATE VIEW entity 
          AS SELECT doi, 'project' AS type FROM project 
             UNION SELECT doi, 'image' AS type FROM image 
-            UNION SELECT doi, 'collection' AS type FROM collection;
+            UNION SELECT doi, 'collection' AS type 
+                    FROM collection 
+                   WHERE doi IS NOT NULL;
