@@ -448,6 +448,17 @@ def get_collection(id):
         d = dict(zip(cols, c.fetchone()))
     return _Collection(d)
 
+def get_collection_by_doi(identifier):
+    if not isinstance(identifier, basestring):
+        raise TypeError('collection DOI must be a string')
+    with DBCursor() as c:
+        c.execute("SELECT * FROM collection WHERE doi = %s", (identifier, ))
+        if c.rowcount == 0:
+            raise ValueError('collection DOI %s not found' % id)
+        cols = [ el[0] for el in c.description ]
+        d = dict(zip(cols, c.fetchone()))
+    return _Collection(d)
+
 def create_collection(images):
     if not isinstance(images, (tuple, list)):
         raise TypeError('images must be a tuple or list')
@@ -573,7 +584,7 @@ def get_entity(identifier):
     if entity_type == 'image':
         return get_image(identifier)
     if entity_type == 'collection':
-        return get_collection(identifier)
+        return get_collection_by_doi(identifier)
     raise ValueError('unknown entity type "%s"' % entity_type)
 
 # eof
