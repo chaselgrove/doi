@@ -1,6 +1,6 @@
 {% extends "base.tmpl" %}
 
-{% block title %}Image {{ entity.identifier }}{% endblock %}
+{% block title %}Image {{ image.identifier }}{% endblock %}
 
 {% block body %}
 
@@ -8,18 +8,18 @@
 
     <tr>
         <td>Identifier</td>
-        <td>{{ entity.identifier}}</td>
+        <td>{{ image.identifier}}</td>
     </tr>
 
     <tr>
         <td>Title</td>
-        <td>{{ entity.title }}</td>
+        <td>{{ image.title }}</td>
     </tr>
 
     <tr>
         <td>Creators</td>
         <td>
-            {% for (name, affiliation) in entity.creators %}
+            {% for (name, affiliation) in image.creators %}
                 {% if affiliation %}
                     {{ name }} ({{ affiliation }})
                 {% else %}
@@ -32,31 +32,31 @@
 
     <tr>
         <td>Publisher</td>
-        <td>{{ entity.publisher }}</td>
+        <td>{{ image.publisher }}</td>
     </tr>
 
     <tr>
         <td>Publication year</td>
-        <td>{{ entity.publicationyear }}</td>
+        <td>{{ image.publicationyear }}</td>
     </tr>
 
     <tr>
         <td>Resource type</td>
-        <td>{{ entity.resourcetype }}</td>
+        <td>{{ image.resourcetype }}</td>
         </td>
     </tr>
 
     <tr>
         <td>Alternate identifiers</td>
         <td>
-            <a href="{{ entity.alternateidentifier }}">{{ entity.alternateidentifier }}</a>
+            <a href="{{ image.alternateidentifier }}">{{ image.alternateidentifier }}</a>
         </td>
     </tr>
 
     <tr>
         <td>Project</td>
         <td>
-            <a href="http://dx.doi.org/{{ entity.project.identifier }}">{{ entity.project.identifier }}</a>
+            <a href="http://dx.doi.org/{{ image.project.identifier }}">{{ image.project.identifier }}</a>
         </td>
     </tr>
 
@@ -70,7 +70,7 @@
     <tr>
         <td>Sizes</td>
         <td>
-            {% for size in entity.sizes %}
+            {% for size in image.sizes %}
                 {{ size }}
                 <br/>
             {% endfor %}
@@ -80,20 +80,20 @@
     <tr>
         <td>Format</td>
         <td>
-            {{ entity.format }}
+            {{ image.format }}
         </td>
     </tr>
 
     <tr>
         <td>Version</td>
-        <td>{{ entity.version }}</td>
+        <td>{{ image.version }}</td>
     </tr>
 
     <tr>
         <td>Rights</td>
         <td>
-            {% if entity.rights %}
-                <a href="{{ entity.rights[1] }}">{{ entity.rights[0] }}</a>
+            {% if image.rights %}
+                <a href="{{ image.rights[1] }}">{{ image.rights[0] }}</a>
             {% else %}
                  no rights
             {% endif %}

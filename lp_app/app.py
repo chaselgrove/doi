@@ -42,18 +42,24 @@ def landing_page(identifier):
                                                         'application/xml'])
         if mt is None:
             flask.abort(406)
-    if isinstance(entity, doi.entities._Project):
-        template = 'project.tmpl'
-    elif isinstance(entity, doi.entities._Image):
-        template = 'image.tmpl'
-    elif isinstance(entity, doi.entities._Collection):
-        template = 'collection.tmpl'
-    else:
-        flask.abort(500)
+
     if mt == 'text/html':
         xml_url = flask.url_for('landing_page', 
                                 identifier='xml/%s' % identifier)
-        data = flask.render_template(template, entity=entity, xml_url=xml_url)
+        if isinstance(entity, doi.entities._Project):
+            data = flask.render_template('project.tmpl', 
+                                         project=entity, 
+                                         xml_url=xml_url)
+        elif isinstance(entity, doi.entities._Image):
+            data = flask.render_template('image.tmpl', 
+                                         image=entity, 
+                                         xml_url=xml_url)
+        elif isinstance(entity, doi.entities._Collection):
+            data = flask.render_template('collection.tmpl', 
+                                         collection=entity, 
+                                         xml_url=xml_url)
+        else:
+            flask.abort(500)
     else:
         data = entity.doi.xml
     resp = flask.Response(data, mimetype=mt)

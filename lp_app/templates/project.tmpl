@@ -1,6 +1,6 @@
 {% extends "base.tmpl" %}
 
-{% block title %}Project doi:{{ entity.doi.identifier }}{% endblock %}
+{% block title %}Project doi:{{ project.doi.identifier }}{% endblock %}
 
 {% block body %}
 
@@ -8,18 +8,18 @@
 
     <tr>
         <td>Identifier</td>
-        <td>{{ entity.doi.identifier}}</td>
+        <td>{{ project.doi.identifier}}</td>
     </tr>
 
     <tr>
         <td>Title</td>
-        <td>{{ entity.doi.metadata['title'] }}</td>
+        <td>{{ project.doi.metadata['title'] }}</td>
     </tr>
 
     <tr>
         <td>Creators</td>
         <td>
-            {% for (name, affiliation) in entity.doi.metadata['creators'] %}
+            {% for (name, affiliation) in project.doi.metadata['creators'] %}
                 {% if affiliation %}
                     {{ name }} ({{ affiliation }})
                 {% else %}
@@ -32,18 +32,18 @@
 
     <tr>
         <td>Publisher</td>
-        <td>{{ entity.doi.metadata['publisher'] }}</td>
+        <td>{{ project.doi.metadata['publisher'] }}</td>
     </tr>
 
     <tr>
         <td>Publication year</td>
-        <td>{{ entity.doi.metadata['publicationyear'] }}</td>
+        <td>{{ project.doi.metadata['publicationyear'] }}</td>
     </tr>
 
     <tr>
         <td>Subjects</td>
         <td>
-            {% for (subject, scheme, uri) in entity.doi.metadata['subjects'] %}
+            {% for (subject, scheme, uri) in project.doi.metadata['subjects'] %}
                 {% if not scheme %}
                     {{ subject }}
                 {% elif not uri %}
@@ -67,7 +67,7 @@
     <tr>
         <td>Contributors</td>
         <td>
-            {% for (type, name, affiliation) in entity.doi.metadata['contributors'] %}
+            {% for (type, name, affiliation) in project.doi.metadata['contributors'] %}
                 {% if affiliation %}
                     {{ type }}: {{ name }} ({{ affiliation }})
                 {% else %}
@@ -81,7 +81,7 @@
     <tr>
         <td>Dates</td>
         <td>
-            {% for (type, date) in entity.doi.metadata['dates'] %}
+            {% for (type, date) in project.doi.metadata['dates'] %}
                 {{ dates }} ({{ type }})
                 <br/>
             {% endfor %}
@@ -90,14 +90,14 @@
 
     <tr>
         <td>Resource type</td>
-        <td>{{ entity.doi.metadata['resourcetype'] }}</td>
+        <td>{{ project.doi.metadata['resourcetype'] }}</td>
         </td>
     </tr>
 
     <tr>
         <td>Alternate identifiers</td>
         <td>
-            {% for (type, identifier) in entity.doi.metadata['alternateidentifiers'] %}
+            {% for (type, identifier) in project.doi.metadata['alternateidentifiers'] %}
                 {% if type == 'URL' %}
                     <a href="{{ identifier }}">{{ identifier }}</a>
                 {% else %}
@@ -111,7 +111,7 @@
     <tr>
         <td>Related identifiers</td>
         <td>
-            {% for (identifier, type, relation) in entity.doi.metadata['relatedidentifiers'] %}
+            {% for (identifier, type, relation) in project.doi.metadata['relatedidentifiers'] %}
                 {% if type == 'PMID' %}
                     {{ relation }} <a href="http://pubmed.org/{{ identifier }}">{{ type }} {{ identifier }}</a>
                 {% elif type == 'DOI' %}
@@ -127,7 +127,7 @@
     <tr>
         <td>Sizes</td>
         <td>
-            {% for size in entity.doi.metadata['sizes'] %}
+            {% for size in project.doi.metadata['sizes'] %}
                 {{ size }}
                 <br/>
             {% endfor %}
@@ -137,7 +137,7 @@
     <tr>
         <td>Formats</td>
         <td>
-            {% for format in entity.doi.metadata['formats'] %}
+            {% for format in project.doi.metadata['formats'] %}
                 {{ format }}
                 <br/>
             {% endfor %}
@@ -146,13 +146,13 @@
 
     <tr>
         <td>Version</td>
-        <td>{{ entity.doi.metadata['version'] }}</td>
+        <td>{{ project.doi.metadata['version'] }}</td>
     </tr>
 
     <tr>
         <td>Rights</td>
         <td>
-            {% for (rights, uri) in entity.doi.metadata['rights'] %}
+            {% for (rights, uri) in project.doi.metadata['rights'] %}
                 {% if uri %}
                     <a href="{{ uri }}">{{ rights }}</a>
                 {% else %}
@@ -166,7 +166,7 @@
     <tr>
         <td>Descriptions</td>
         <td>
-            {% for (type, description) in entity.doi.metadata['descriptions'] %}
+            {% for (type, description) in project.doi.metadata['descriptions'] %}
                 {{ description }} ({{ type }})
                 <br/>
             {% endfor %}
@@ -176,7 +176,7 @@
     <tr>
         <td>Geolocations</td>
         <td>
-            {% for place in entity.doi.metadata['geolocations'] %}
+            {% for place in project.doi.metadata['geolocations'] %}
                 {{ place }}
                 <br/>
             {% endfor %}
