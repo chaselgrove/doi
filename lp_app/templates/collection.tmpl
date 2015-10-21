@@ -1,6 +1,6 @@
 {% extends "base.tmpl" %}
 
-{% block title %}Collection doi:{{ collection.doi.identifier }}{% endblock %}
+{% block title %}Collection doi:{{ collection.identifier }}{% endblock %}
 
 {% block body %}
 
@@ -8,18 +8,18 @@
 
     <tr>
         <td>Identifier</td>
-        <td>{{ collection.doi.identifier}}</td>
+        <td>{{ collection.identifier}}</td>
     </tr>
 
     <tr>
         <td>Title</td>
-        <td>{{ collection.doi.metadata['title'] }}</td>
+        <td>{{ collection.title }}</td>
     </tr>
 
     <tr>
         <td>Creators</td>
         <td>
-            {% for (name, affiliation) in collection.doi.metadata['creators'] %}
+            {% for (name, affiliation) in collection.creators %}
                 {% if affiliation %}
                     {{ name }} ({{ affiliation }})
                 {% else %}
@@ -32,94 +32,42 @@
 
     <tr>
         <td>Publisher</td>
-        <td>{{ collection.doi.metadata['publisher'] }}</td>
+        <td>{{ collection.publisher }}</td>
     </tr>
 
     <tr>
         <td>Publication year</td>
-        <td>{{ collection.doi.metadata['publicationyear'] }}</td>
-    </tr>
-
-    <tr>
-        <td>Subjects</td>
-        <td>
-            {% for (subject, scheme, uri) in collection.doi.metadata['subjects'] %}
-                {% if not scheme %}
-                    {{ subject }}
-                {% elif not uri %}
-                    {% if scheme == 'MeSH' %}
-                        MeSH {{ subject }}
-                    {% else %}
-                        {{ subject }} ({{ scheme }})
-                    {% endif %}
-                {% else %}
-                    {% if scheme == 'MeSH' %}
-                        <a href="{{ uri }}">MeSH</a> {{ subject }}
-                    {% else %}
-                        {{ subject }} (<a href="{{ uri }}">{{ scheme }}</a>)
-                    {% endif %}
-                {% endif %}
-                <br/>
-            {% endfor %}
-        </td>
+        <td>{{ collection.publicationyear }}</td>
     </tr>
 
     <tr>
         <td>Contributors</td>
         <td>
-            {% for (type, name, affiliation) in collection.doi.metadata['contributors'] %}
-                {% if affiliation %}
-                    {{ type }}: {{ name }} ({{ affiliation }})
-                {% else %}
-                    {{ type }}: {{ name }}
-                {% endif %}
-                <br/>
-            {% endfor %}
-        </td>
-    </tr>
-
-    <tr>
-        <td>Dates</td>
-        <td>
-            {% for (type, date) in collection.doi.metadata['dates'] %}
-                {{ dates }} ({{ type }})
-                <br/>
-            {% endfor %}
+            to do
         </td>
     </tr>
 
     <tr>
         <td>Resource type</td>
-        <td>{{ collection.doi.metadata['resourcetype'] }}</td>
+        <td>{{ collection.resourcetype }}</td>
         </td>
     </tr>
 
     <tr>
         <td>Alternate identifiers</td>
         <td>
-            {% for (type, identifier) in collection.doi.metadata['alternateidentifiers'] %}
-                {% if type == 'URL' %}
-                    <a href="{{ identifier }}">{{ identifier }}</a>
-                {% else %}
-                    {{ identifier }} ({{ type }})
-                {% endif %}
-                <br/>
-            {% endfor %}
+            <a href="{{ collection.link }}">{{ collection.link }}</a>
         </td>
     </tr>
 
     <tr>
         <td>Related identifiers</td>
         <td>
-            {% for (identifier, type, relation) in collection.doi.metadata['relatedidentifiers'] %}
-                {% if type == 'PMID' %}
-                    {{ relation }} <a href="http://pubmed.org/{{ identifier }}">{{ type }} {{ identifier }}</a>
-                {% elif type == 'DOI' %}
-                    {{ relation }} <a href="http://dx.doi.org/{{ identifier }}">{{ type }} {{ identifier }}</a>
-                {% else %}
-                    {{ relation }} {{ type }} {{ identifier }}
-                {% endif %}
-                <br/>
+            {% for (type, identifier) in collection.relatedidentifiers['IsDerivedFrom'] %}
+                IsDerivedFrom {{ type }} {{ identifier }}
+            {% endfor %}
+            {% for (type, identifier) in collection.relatedidentifiers['HasPart'] %}
+                HasPart {{ type }} {{ identifier }}
             {% endfor %}
         </td>
     </tr>
@@ -127,7 +75,7 @@
     <tr>
         <td>Sizes</td>
         <td>
-            {% for size in collection.doi.metadata['sizes'] %}
+            {% for size in collection.sizes %}
                 {{ size }}
                 <br/>
             {% endfor %}
@@ -137,7 +85,7 @@
     <tr>
         <td>Formats</td>
         <td>
-            {% for format in collection.doi.metadata['formats'] %}
+            {% for format in collection.formats %}
                 {{ format }}
                 <br/>
             {% endfor %}
@@ -146,27 +94,20 @@
 
     <tr>
         <td>Version</td>
-        <td>{{ collection.doi.metadata['version'] }}</td>
+        <td>{{ collection.version }}</td>
     </tr>
 
     <tr>
         <td>Rights</td>
         <td>
-            {% for (rights, uri) in collection.doi.metadata['rights'] %}
-                {% if uri %}
-                    <a href="{{ uri }}">{{ rights }}</a>
-                {% else %}
-                    {{ rights }}
-                {% endif %}
-                <br/>
-            {% endfor %}
+            to do
         </td>
     </tr>
 
     <tr>
         <td>Descriptions</td>
         <td>
-            {% for (type, description) in collection.doi.metadata['descriptions'] %}
+            {% for (type, description) in collection.descriptions %}
                 {{ description }} ({{ type }})
                 <br/>
             {% endfor %}
@@ -176,7 +117,7 @@
     <tr>
         <td>Geolocations</td>
         <td>
-            {% for place in collection.doi.metadata['geolocations'] %}
+            {% for place in collection.geolocations %}
                 {{ place }}
                 <br/>
             {% endfor %}

@@ -53,7 +53,7 @@ class _Entity:
 
     @property
     def doi(self):
-        # this can be the case for collections
+        # self.identifier can be None for collections
         if self.identifier is None:
             return None
         if not self._doi:
@@ -80,6 +80,7 @@ class _Entity:
     def resourcetype(self):
         return self.doi.metadata['resourcetype']
 
+    @property
     def link(self):
         if 'alternateidentifiers' not in self.doi.metadata:
             return None
@@ -260,7 +261,6 @@ class _Collection(_Entity):
         # a DOI may not be assigned to a collection, so we have a unique ID 
         # and then a DOI which may or may not have a value
         self.id = d['id']
-        self._doi = d['doi']
         self._images = None
         return
 
@@ -302,6 +302,7 @@ class _Collection(_Entity):
               'resourcetype': 'Dataset/Imaging Data', 
               'alternateidentifiers': [('URL', url)]}
         self._doi = mint(md, test_flag)
+        self.identifier = self._doi.identifier
         md = self.doi.copy_metadata()
         md['title'] = 'Image collection %s' % self.doi.identifier
         projects = {}
@@ -378,6 +379,12 @@ class _Collection(_Entity):
             md['contributors'].append(('Funder', funder, None))
         self.doi.update_metadata(md)
         return
+
+    @property
+    def formats(self):
+        if 'formats' not in self.doi.metadata:
+            return []
+        return self.doi.metadata['formats']
 
 class _Search:
 
