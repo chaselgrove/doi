@@ -327,7 +327,7 @@ class _Collection(_Entity):
             funder=None, 
             update_others_flag=True):
         """tag the collection with a DOI"""
-        if self._doi is not None:
+        if self.identifier is not None:
             raise ValueError('collection has already been tagged')
         url = 'http://doi.virtualbrain.org/search/reconstitute/%s' % self.id
         md = {'creators': ['UMass/CANDI DOI project'], 
@@ -387,7 +387,7 @@ class _Collection(_Entity):
                  authors=None, 
                  funder=None):
         """update the collection DOI"""
-        if self._doi is None:
+        if self.identifier is None:
             raise ValueError('collection has not been tagged')
         with DBCursor() as c:
             params = (self.id, description, pubmed_id, publication_doi, funder)

@@ -273,7 +273,7 @@ def search(search_id):
                 funder = res_dict['funder']
             else:
                 funder = None
-            if search.collection._doi:
+            if search.collection.identifier:
                 search.collection.add_info(res_dict['description'], 
                                            pubmed_id, 
                                            publication_doi, 
