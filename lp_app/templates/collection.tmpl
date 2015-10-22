@@ -126,4 +126,28 @@
 
 </table>
 
+<table>
+    <tr>
+        <th>Description</th>
+        <th>PubMed ID</th>
+        <th>Publication DOI</th>
+        <th>Funder</th>
+        <th>Authors</th>
+    </tr>
+    {% for info in collection.info %}
+        <tr>
+            <td>{{ info['description'] }}</td>
+            <td>{{ info['pubmed_id'] }}</td>
+            <td>{{ info['pub_doi'] }}</td>
+            <td>{{ info['funder'] }}</td>
+            <td>
+                {% for author in info['authors'] %}
+                    {{ author }}
+                    <br/>
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
 {% endblock %}

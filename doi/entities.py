@@ -44,6 +44,27 @@ _project_subjects_sql = """SELECT *
                             WHERE project = %s 
                             ORDER BY label"""
 
+_collection_info_sql = """SELECT * 
+                            FROM collection_info 
+                           WHERE collection = %s 
+                           ORDER BY id"""
+
+_insert_collection_info_sql = """INSERT INTO collection_info (collection, 
+                                                              description, 
+                                                              pubmed_id, 
+                                                              pub_doi, 
+                                                              funder) 
+                                 VALUES (%s, %s, %s, %s, %s)"""
+
+_collection_info_authors_sql = """SELECT author 
+                                    FROM collection_info_author 
+                                   WHERE collection_info = %s 
+                                   ORDER BY id"""
+
+_insert_collection_info_authors_sql = """INSERT INTO collection_info_author 
+                                                     (collection_info, author) 
+                                         VALUES (%s, %s)"""
+
 class _Entity:
 
     def __init__(self, d):
@@ -262,6 +283,20 @@ class _Collection(_Entity):
         # and then a DOI which may or may not have a value
         self.id = d['id']
         self._images = None
+        self._load_info()
+        return
+
+    def _load_info(self):
+        self.info = []
+        with DBCursor() as c:
+            c.execute(_collection_info_sql, (self.id, ))
+            cols = [ el[0] for el in c.description ]
+            for row in c:
+                self.info.append(dict(zip(cols, row)))
+        with DBCursor() as c:
+            for info in self.info:
+                c.execute(_collection_info_authors_sql, (info['id'], ))
+                info['authors'] = [ row[0] for row in c ]
         return
 
     @property
@@ -338,22 +373,32 @@ class _Collection(_Entity):
                        '%d files' % files, 
                        '%d images' % len(self.images)]
         self.doi.update_metadata(md)
-        self.update_metadata(description, 
-                             pubmed_id, 
-                             publication_doi, 
-                             authors, 
-                             funder)
+        self.add_info(description, 
+                      pubmed_id, 
+                      publication_doi, 
+                      authors, 
+                      funder)
         return
 
-    def update_metadata(self, 
-                        description, 
-                        pubmed_id=None, 
-                        publication_doi=None, 
-                        authors=None, 
-                        funder=None):
+    def add_info(self, 
+                 description, 
+                 pubmed_id=None, 
+                 publication_doi=None, 
+                 authors=None, 
+                 funder=None):
         """update the collection DOI"""
         if self._doi is None:
             raise ValueError('collection has not been tagged')
+        with DBCursor() as c:
+            params = (self.id, description, pubmed_id, publication_doi, funder)
+            c.execute(_insert_collection_info_sql, params)
+            c.execute("SELECT CURRVAL('collection_info_id_seq')")
+            info_id = c.fetchone()[0]
+            if authors:
+                for author in authors:
+                    params = (info_id, author)
+                    c.execute(_insert_collection_info_authors_sql, params)
+            self._load_info()
         md = self.doi.copy_metadata()
         if 'descriptions' not in md:
             md['descriptions'] = []

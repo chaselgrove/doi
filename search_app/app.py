@@ -274,11 +274,11 @@ def search(search_id):
             else:
                 funder = None
             if search.collection._doi:
-                search.collection.update_metadata(res_dict['description'], 
-                                                  pubmed_id, 
-                                                  publication_doi, 
-                                                  authors, 
-                                                  funder)
+                search.collection.add_info(res_dict['description'], 
+                                           pubmed_id, 
+                                           publication_doi, 
+                                           authors, 
+                                           funder)
             else:
                 search.collection.tag(res_dict['description'], 
                                       pubmed_id, 

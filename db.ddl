@@ -31,6 +31,17 @@ CREATE TABLE collection_image (collection TEXT REFERENCES collection,
                                image TEXT REFERENCES image, 
                                PRIMARY KEY (collection, image));
 
+CREATE TABLE collection_info (id SERIAL PRIMARY KEY, 
+                              collection TEXT NOT NULL REFERENCES collection, 
+                              description TEXT NOT NULL, 
+                              pubmed_id TEXT DEFAULT NULL, 
+                              pub_doi TEXT DEFAULT NULL, 
+                              funder TEXT DEFAULT NULL);
+
+CREATE TABLE collection_info_author (id SERIAL PRIMARY KEY, 
+                                     collection_info INTEGER REFERENCES collection_info NOT NULL, 
+                                     author TEXT NOT NULL);
+
 CREATE TABLE search (id TEXT PRIMARY KEY, 
                      description TEXT NOT NULL, 
                      t_created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), 
