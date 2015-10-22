@@ -2,72 +2,40 @@
 
 {% block title %}Collection doi:{{ collection.identifier }}{% endblock %}
 
+{% block h2 %}{{ collection.title }}{% endblock %}
+
+{% block pub_info %}{{ collection.publisher }}, {{ collection.publicationyear }}{% endblock %}
+
+{% block doi %}{{ collection.identifier }}{% endblock %}
+
 {% block body %}
 
 <table>
 
     <tr>
-        <td>Identifier</td>
-        <td>{{ collection.identifier}}</td>
-    </tr>
-
-    <tr>
-        <td>Title</td>
-        <td>{{ collection.title }}</td>
-    </tr>
-
-    <tr>
-        <td>Creators</td>
+        <td>Source projects</td>
         <td>
-            {% for (name, affiliation) in collection.creators %}
-                {% if affiliation %}
-                    {{ name }} ({{ affiliation }})
+            {% for (type, identifier) in collection.relatedidentifiers['IsDerivedFrom'] %}
+                {% if type == 'DOI' %}
+                    {{ identifier | doi_link }}
                 {% else %}
-                    {{ name }}
+                    {{ type }} {{ identifier }}
                 {% endif %}
                 <br/>
             {% endfor %}
         </td>
-    </tr>
+     </tr>
 
-    <tr>
-        <td>Publisher</td>
-        <td>{{ collection.publisher }}</td>
-    </tr>
-
-    <tr>
-        <td>Publication year</td>
-        <td>{{ collection.publicationyear }}</td>
-    </tr>
-
-    <tr>
-        <td>Contributors</td>
+     <tr>
+        <td>Source images</td>
         <td>
-            to do
-        </td>
-    </tr>
-
-    <tr>
-        <td>Resource type</td>
-        <td>{{ collection.resourcetype }}</td>
-        </td>
-    </tr>
-
-    <tr>
-        <td>Alternate identifiers</td>
-        <td>
-            <a href="{{ collection.link }}">{{ collection.link }}</a>
-        </td>
-    </tr>
-
-    <tr>
-        <td>Related identifiers</td>
-        <td>
-            {% for (type, identifier) in collection.relatedidentifiers['IsDerivedFrom'] %}
-                IsDerivedFrom {{ type }} {{ identifier }}
-            {% endfor %}
             {% for (type, identifier) in collection.relatedidentifiers['HasPart'] %}
-                HasPart {{ type }} {{ identifier }}
+                {% if type == 'DOI' %}
+                    {{ identifier | doi_link }}
+                {% else %}
+                    {{ type }} {{ identifier }}
+                {% endif %}
+                <br/>
             {% endfor %}
         </td>
     </tr>
@@ -93,38 +61,17 @@
     </tr>
 
     <tr>
-        <td>Version</td>
-        <td>{{ collection.version }}</td>
-    </tr>
-
-    <tr>
         <td>Rights</td>
         <td>
             to do
         </td>
     </tr>
 
-    <tr>
-        <td>Descriptions</td>
-        <td>
-            {% for (type, description) in collection.descriptions %}
-                {{ description }} ({{ type }})
-                <br/>
-            {% endfor %}
-        </td>
-    </tr>
-
-    <tr>
-        <td>Geolocations</td>
-        <td>
-            {% for place in collection.geolocations %}
-                {{ place }}
-                <br/>
-            {% endfor %}
-        </td>
-    </tr>
-
 </table>
+
+<p>
+<a href="{{ collection.link }}">Refine/download</a>
+</p>
 
 <table>
     <tr>
@@ -137,8 +84,16 @@
     {% for info in collection.info %}
         <tr>
             <td>{{ info['description'] }}</td>
-            <td>{{ info['pubmed_id'] }}</td>
-            <td>{{ info['pub_doi'] }}</td>
+            <td>
+                {% if info['pubmed_id'] %}
+                    {{ info['pubmed_id'] | pubmed_link }}
+                {% endif %}
+            </td>
+            <td>
+                {% if info['pub_doi'] %}
+                    {{ info['pub_doi'] | doi_link}}
+                {% endif %}
+            </td>
             <td>{{ info['funder'] }}</td>
             <td>
                 {% for author in info['authors'] %}

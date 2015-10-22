@@ -2,19 +2,15 @@
 
 {% block title %}Image {{ image.identifier }}{% endblock %}
 
+{% block h2 %}{{ image.title }}{% endblock %}
+
+{% block doi %}{{ image.identifier }}{% endblock %}
+
+{% block pub_info %}{{ image.publisher }}, {{ image.publicationyear }}{% endblock %}
+
 {% block body %}
 
 <table>
-
-    <tr>
-        <td>Identifier</td>
-        <td>{{ image.identifier}}</td>
-    </tr>
-
-    <tr>
-        <td>Title</td>
-        <td>{{ image.title }}</td>
-    </tr>
 
     <tr>
         <td>Creators</td>
@@ -27,29 +23,6 @@
                 {% endif %}
                 <br/>
             {% endfor %}
-        </td>
-    </tr>
-
-    <tr>
-        <td>Publisher</td>
-        <td>{{ image.publisher }}</td>
-    </tr>
-
-    <tr>
-        <td>Publication year</td>
-        <td>{{ image.publicationyear }}</td>
-    </tr>
-
-    <tr>
-        <td>Resource type</td>
-        <td>{{ image.resourcetype }}</td>
-        </td>
-    </tr>
-
-    <tr>
-        <td>Alternate identifiers</td>
-        <td>
-            <a href="{{ image.alternateidentifier }}">{{ image.alternateidentifier }}</a>
         </td>
     </tr>
 
@@ -101,5 +74,10 @@
     </tr>
 
 </table>
+
+<p>
+<a href="{{ image.link }}">Download</a>
+</p>
+
 
 {% endblock %}

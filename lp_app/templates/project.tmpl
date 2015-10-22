@@ -2,19 +2,15 @@
 
 {% block title %}Project doi:{{ project.identifier }}{% endblock %}
 
+{% block h2 %}{{ project.title }}{% endblock %}
+
+{% block pub_info %}{{ project.publisher }}, {{ project.publicationyear }}{% endblock %}
+
+{% block doi %}{{ project.identifier }}{% endblock %}
+
 {% block body %}
 
 <table>
-
-    <tr>
-        <td>Identifier</td>
-        <td>{{ project.identifier}}</td>
-    </tr>
-
-    <tr>
-        <td>Title</td>
-        <td>{{ project.title }}</td>
-    </tr>
 
     <tr>
         <td>Creators</td>
@@ -31,21 +27,13 @@
     </tr>
 
     <tr>
-        <td>Publisher</td>
-        <td>{{ project.publisher }}</td>
+        <td>Contact</td>
+        <td>{{ project.contributors['ContactPerson'] }}</td>
     </tr>
 
     <tr>
-        <td>Publication year</td>
-        <td>{{ project.publicationyear }}</td>
-    </tr>
-
-    <tr>
-        <td>Contributors</td>
-        <td>
-            {{ project.contributors['ContactPerson'] }}
-            {{ project.contributors['Funder'] }}
-        </td>
+        <td>Funder</td>
+        <td>{{ project.contributors['Funder'] }}</td>
     </tr>
 
     <tr>
@@ -56,26 +44,37 @@
     </tr>
 
     <tr>
-        <td>Resource type</td>
-        <td>{{ project.resourcetype }}</td>
-        </td>
-    </tr>
-
-    <tr>
-        <td>Alternate identifiers</td>
-        <td>
-            <a href="{{ project.link }}">{{ project.link }}</a>
-        </td>
-    </tr>
-
-    <tr>
-        <td>Related identifiers</td>
+        <td>Documented by</td>
         <td>
             {% for (type, identifier) in project.relatedidentifiers['IsDocumentedBy'] %}
-                IdDocumentedBy {{ type }} {{ identifier }}
+                {% if type == 'DOI' %}
+                    {{ identifier | doi_link }}
+                {% elif type == 'PMID' %}
+                    {{ identifier | pubmed_link }}
+                {% else %}
+                    {{ type }} {{ identifier }}
+                {% endif %}
+                <br/>
             {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
+        <td>Images in project</td>
+        <td>
             {% for (type, identifier) in project.relatedidentifiers['HasPart'] %}
-                HasPart {{ type }} {{ identifier }}
+                {{ identifier | doi_link }}
+                <br/>
+            {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
+        <td>Collections using project</td>
+        <td>
+            {% for (type, identifier) in project.relatedidentifiers['IsSourceOf'] %}
+                {{ identifier | doi_link }}
+                <br/>
             {% endfor %}
         </td>
     </tr>
@@ -113,16 +112,6 @@
     </tr>
 
     <tr>
-        <td>Descriptions</td>
-        <td>
-            {% for (type, description) in project.descriptions %}
-                {{ description }} ({{ type }})
-                <br/>
-            {% endfor %}
-        </td>
-    </tr>
-
-    <tr>
         <td>Geolocations</td>
         <td>
             {% for place in project.geolocations %}
@@ -133,5 +122,14 @@
     </tr>
 
 </table>
+
+<p>
+<a href="{{ project.link }}">Project home</a>
+</p>
+
+{% for (type, description) in project.descriptions %}
+    <h4>{{ type }}</h4>
+    <p>{{ description }}</p>
+{% endfor %}
 
 {% endblock %}

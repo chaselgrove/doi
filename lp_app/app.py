@@ -6,6 +6,14 @@ import doi.entities
 
 app = flask.Flask(__name__)
 
+@app.template_filter('doi_link')
+def doi_link(doi):
+    return '<a href="http://dx.doi.org/%s">%s</a>' % (doi, doi)
+
+@app.template_filter('pubmed_link')
+def doi_link(pubmed_id):
+    return '<a href="http://pubmed.org/%s">%s</a>' % (pubmed_id, pubmed_id)
+
 @app.errorhandler(404)
 def not_found(error):
     return (flask.render_template('404.tmpl'), 404)

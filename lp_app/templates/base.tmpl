@@ -18,7 +18,19 @@ table td {
 
 <body>
 
+<h2>{% block h2 %}{% endblock %}</h2>
+
+<p>
+{% block pub_info %}{% endblock %}
+</p>
+
+<p>
+DOI {% block doi %}{% endblock %}
+</p>
+
+<p>
 <a href="{{ xml_url }}" target="_blank">DataCite XML</a>
+</p>
 
 {% block body %}
 {% endblock %}
