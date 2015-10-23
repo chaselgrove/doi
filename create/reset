@@ -2,6 +2,8 @@
 
 psql -h localhost -U doi << EOF
 DELETE FROM search;
+DELETE FROM collection_info_author;
+DELETE FROM collection_info;
 DELETE FROM collection_image;
 DELETE FROM collection;
 DELETE FROM image;
