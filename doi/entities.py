@@ -369,10 +369,13 @@ class _Collection(_Entity):
             t = (image.identifier, 'DOI', 'HasPart')
             md['relatedidentifiers'].append(t)
             image.note_collection(self, update_others_flag)
+        rights = set()
         for (identifier, project) in projects.iteritems():
             t = (identifier, 'DOI', 'IsDerivedFrom')
             md['relatedidentifiers'].append(t)
             project.note_collection(self, update_others_flag)
+            rights.update(project.rights)
+        md['rights'] = list(rights)
         with DBCursor() as c:
             c.execute("UPDATE collection SET doi = %s WHERE id = %s", 
                       (self.doi.identifier, self.id))
