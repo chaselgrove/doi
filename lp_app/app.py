@@ -28,9 +28,7 @@ def internal_server_error(error):
 
 @app.route('/')
 def index():
-    dois = doi.get_all_dois()
-    return flask.render_template('index.tmpl', 
-                                 base_url=flask.request.script_root, dois=dois)
+    return flask.redirect('http://doi.virtualbrain.org/')
 
 @app.route('/<path:identifier>')
 def landing_page(identifier):
