@@ -21,6 +21,12 @@
     ], 
     "title": "CANDI Share Schizophrenia Bulletin 2008 data", 
     "resourcetype": "Dataset/Imaging Data", 
+    "dates": [
+        [
+            "Collected", 
+            "1996-2006"
+        ]
+    ], 
     "sizes": [
         "103 subjects", 
         "206 volumes", 
