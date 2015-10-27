@@ -39,7 +39,12 @@
     <tr>
         <td>Dates</td>
         <td>
-            to do
+            {% for type in project.dates %}
+                {% for date in project.dates[type] %}
+                    {{ type }} {{ date }}
+                    <br/>
+                {% endfor %}
+            {% endfor %}
         </td>
     </tr>
 

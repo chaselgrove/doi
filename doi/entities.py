@@ -128,6 +128,16 @@ class _Entity:
         return d
 
     @property
+    def dates(self):
+        if 'dates' not in self.doi.metadata:
+            return {}
+        d = {}
+        for (type, date) in self.doi.metadata['dates']:
+            d.setdefault(type, [])
+            d[type].append(date)
+        return d
+
+    @property
     def version(self):
         if 'version' not in self.doi.metadata:
             return None
