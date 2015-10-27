@@ -36,7 +36,10 @@
     <tr>
         <td>Collections</td>
         <td>
-            to do
+            {% for collection in image.collections %}
+                <a href="http://dx.doi.org/{{ collection.identifier }}">{{ collection.identifier }}</a>
+                <br/>
+            {% endfor %}
         </td>
     </tr>
 

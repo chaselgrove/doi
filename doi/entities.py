@@ -240,6 +240,7 @@ class _Image(_Entity):
         self._project = None
         self._subject_label = d['subject']
         self._subject = None
+        self._collections = None
         self.type = d['type']
         self.xnat_experiment_id = d['xnat_experiment_id']
         self.xnat_id = d['xnat_id']
@@ -263,6 +264,16 @@ class _Image(_Entity):
         if 'formats' not in self.doi.metadata:
             return []
         return self.doi.metadata['formats'][0]
+
+    @property
+    def collections(self):
+        if self._collections is None:
+            self._collections = []
+            for (type, identifier) in self.relatedidentifiers['IsPartOf']:
+                print identifier, self._project.identifier
+                if identifier != self._project.identifier:
+                    self._collections.append(get_collection_by_doi(identifier))
+        return self._collections
 
     def note_collection(self, collection, update_flag=True):
         if not isinstance(collection, _Collection):
