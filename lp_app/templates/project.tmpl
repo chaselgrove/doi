@@ -112,7 +112,14 @@
     <tr>
         <td>Rights</td>
         <td>
-            to do
+            {% for (rights, uri) in project.rights %}
+                {% if uri is not none %}
+                    <a href="{{ uri }}">{{ rights }}</a>
+                {% else %}
+                    {{ rights }}
+                {% endif %}
+                <br/>
+            {% endfor %}
         </td>
     </tr>
 

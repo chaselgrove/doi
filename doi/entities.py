@@ -146,8 +146,8 @@ class _Entity:
     @property
     def rights(self):
         if 'rights' not in self.doi.metadata:
-            return None
-        return self.doi.metadata['rights'][0]
+            return []
+        return self.doi.metadata['rights']
 
     @property
     def descriptions(self):
