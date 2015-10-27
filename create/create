@@ -47,6 +47,18 @@ def seg_url(project, id):
     url += project
     return url
 
+def set_project_doi(project_code, identifier):
+    url = 'http://localhost:8080/xnat/data/projects/%s' % project_code
+    r = requests.get(url + '?format=xml')
+    doc = xml.dom.minidom.parseString(r.content)
+    update_doi(doc, 'xnat:Project', identifier)
+    data = doc.toxml()
+    auth = (os.environ['XNAT_USER'], os.environ['XNAT_PASSWORD'])
+    requests.put(url + '?inbody=true', data=data, auth=auth)
+    # fix project permissions
+    requests.put(url + '/accessibility/public', auth=auth)
+    return
+
 def set_anat_doi(project_code, subject, identifier):
     experiment = '%s_MR' % subject
     url = 'http://localhost:8080/xnat/data/projects/'
@@ -179,6 +191,9 @@ with doi.db.DBCursor() as c:
               (candi_share.identifier, 'cs_schizbull08'))
     c.execute("INSERT INTO project (doi, xnat_id) VALUES (%s, %s)", 
               (ibsr.identifier, 'ibsr'))
+
+set_project_doi('ibsr', ibsr.identifier)
+set_project_doi('cs_schizbull08', candi_share.identifier)
 
 create_subjects('cs_schizbull08')
 create_subjects('ibsr')
