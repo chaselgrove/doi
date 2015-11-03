@@ -56,6 +56,8 @@
                     {{ identifier | doi_link }}
                 {% elif type == 'PMID' %}
                     {{ identifier | pubmed_link }}
+                {% elif type == 'URL' %}
+                    <a href="{{ identifier }}">{{ identifier }}</a>
                 {% else %}
                     {{ type }} {{ identifier }}
                 {% endif %}
