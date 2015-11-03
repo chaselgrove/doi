@@ -68,11 +68,14 @@
     <tr>
         <td>Rights</td>
         <td>
-            {% if image.rights %}
-                <a href="{{ image.rights[1] }}">{{ image.rights[0] }}</a>
-            {% else %}
-                 no rights
-            {% endif %}
+            {% for (rights, uri) in image.rights %}
+                {% if uri is not none %}
+                    <a href="{{ uri }}">{{ rights }}</a>
+                {% else %}
+                    {{ rights }}
+                {% endif %}
+                <br/>
+            {% endfor %}
         </td>
     </tr>
 
