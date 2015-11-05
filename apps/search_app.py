@@ -198,19 +198,19 @@ app = flask.Flask(__name__)
 
 @app.errorhandler(400)
 def not_found(error):
-    return (flask.render_template('400.tmpl'), 400)
+    return (flask.render_template('search_400.tmpl'), 400)
 
 @app.errorhandler(404)
 def not_found(error):
-    return (flask.render_template('404.tmpl'), 404)
+    return (flask.render_template('search_404.tmpl'), 404)
 
 @app.errorhandler(406)
 def not_found(error):
-    return (flask.render_template('406.tmpl'), 406)
+    return (flask.render_template('search_406.tmpl'), 406)
 
 @app.route('/')
 def index():
-    return flask.render_template('index.tmpl', 
+    return flask.render_template('search_index.tmpl', 
                                  post_url=flask.url_for('post_search'), 
                                  form_dict=form_dict_defaults, 
                                  error=None)
@@ -219,7 +219,7 @@ def index():
 def post_search():
     res_dict = parse_search(flask.request.form)
     if res_dict['status'] == 400:
-        return flask.render_template('index.tmpl', 
+        return flask.render_template('search_index.tmpl', 
                                      post_url=flask.url_for('post_search'), 
                                      form_dict=res_dict, 
                                      error=res_dict['error'])
@@ -238,7 +238,7 @@ def search(search_id):
     projects = doi.get_all_projects()
     res_dict = tag_dict_defaults
     if flask.request.method == 'GET':
-        return flask.render_template('search.tmpl', 
+        return flask.render_template('search_search.tmpl', 
                                     search=search, 
                                     projects=projects, 
                                     post_url=search_url, 
@@ -290,7 +290,7 @@ def search(search_id):
             url = fmt % search.collection.doi.identifier
             return flask.redirect(url)
         error = res_dict['error']
-    return flask.render_template('search.tmpl', 
+    return flask.render_template('search_search.tmpl', 
                                  search=search, 
                                  projects=projects, 
                                  post_url=search_url, 
