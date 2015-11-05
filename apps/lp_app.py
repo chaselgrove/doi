@@ -16,15 +16,18 @@ def doi_link(pubmed_id):
 
 @app.errorhandler(404)
 def not_found(error):
-    return (flask.render_template('lp_404.tmpl'), 404)
+    return (flask.render_template('lp_404.tmpl', 
+                                  script_root=flask.request.script_root), 404)
 
 @app.errorhandler(406)
 def not_acceptable(error):
-    return (flask.render_template('lp_406.tmpl'), 406)
+    return (flask.render_template('lp_406.tmpl'
+                                  script_root=flask.request.script_root), 406)
 
 @app.errorhandler(500)
 def internal_server_error(error):
-    return (flask.render_template('lp_500.tmpl'), 500)
+    return (flask.render_template('lp_500.tmpl'
+                                  script_root=flask.request.script_root), 500)
 
 @app.route('/')
 def index():
@@ -54,14 +57,17 @@ def landing_page(identifier):
                                 identifier='xml/%s' % identifier)
         if isinstance(entity, doi.entities._Project):
             data = flask.render_template('lp_project.tmpl', 
+                                         script_root=flask.request.script_root, 
                                          project=entity, 
                                          xml_url=xml_url)
         elif isinstance(entity, doi.entities._Image):
             data = flask.render_template('lp_image.tmpl', 
+                                         script_root=flask.request.script_root, 
                                          image=entity, 
                                          xml_url=xml_url)
         elif isinstance(entity, doi.entities._Collection):
             data = flask.render_template('lp_collection.tmpl', 
+                                         script_root=flask.request.script_root, 
                                          collection=entity, 
                                          xml_url=xml_url)
         else:

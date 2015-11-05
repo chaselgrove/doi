@@ -198,19 +198,23 @@ app = flask.Flask(__name__)
 
 @app.errorhandler(400)
 def not_found(error):
-    return (flask.render_template('search_400.tmpl'), 400)
+    return (flask.render_template('search_400.tmpl', 
+                                  script_root=flask.request.script_root), 400)
 
 @app.errorhandler(404)
 def not_found(error):
-    return (flask.render_template('search_404.tmpl'), 404)
+    return (flask.render_template('search_404.tmpl', 
+                                  script_root=flask.request.script_root), 404)
 
 @app.errorhandler(406)
 def not_found(error):
-    return (flask.render_template('search_406.tmpl'), 406)
+    return (flask.render_template('search_406.tmpl', 
+                                  script_root=flask.request.script_root), 406)
 
 @app.route('/')
 def index():
     return flask.render_template('search_index.tmpl', 
+                                 script_root=flask.request.script_root, 
                                  post_url=flask.url_for('post_search'), 
                                  form_dict=form_dict_defaults, 
                                  error=None)
@@ -220,6 +224,7 @@ def post_search():
     res_dict = parse_search(flask.request.form)
     if res_dict['status'] == 400:
         return flask.render_template('search_index.tmpl', 
+                                     script_root=flask.request.script_root, 
                                      post_url=flask.url_for('post_search'), 
                                      form_dict=res_dict, 
                                      error=res_dict['error'])
@@ -239,11 +244,12 @@ def search(search_id):
     res_dict = tag_dict_defaults
     if flask.request.method == 'GET':
         return flask.render_template('search_search.tmpl', 
-                                    search=search, 
-                                    projects=projects, 
-                                    post_url=search_url, 
-                                    tag_form_dict=res_dict, 
-                                    error=None)
+                                     script_root=flask.request.script_root, 
+                                     search=search, 
+                                     projects=projects, 
+                                     post_url=search_url, 
+                                     tag_form_dict=res_dict, 
+                                     error=None)
     if flask.request.form['submit'] == 'Update':
         excludes = []
         includes = []
@@ -291,6 +297,7 @@ def search(search_id):
             return flask.redirect(url)
         error = res_dict['error']
     return flask.render_template('search_search.tmpl', 
+                                 script_root=flask.request.script_root, 
                                  search=search, 
                                  projects=projects, 
                                  post_url=search_url, 
