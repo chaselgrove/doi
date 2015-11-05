@@ -16,17 +16,17 @@ def doi_link(pubmed_id):
 
 @app.errorhandler(404)
 def not_found(error):
-    return (flask.render_template('lp_404.tmpl', 
+    return (flask.render_template('404.tmpl', 
                                   script_root=flask.request.script_root), 404)
 
 @app.errorhandler(406)
 def not_acceptable(error):
-    return (flask.render_template('lp_406.tmpl', 
+    return (flask.render_template('406.tmpl', 
                                   script_root=flask.request.script_root), 406)
 
 @app.errorhandler(500)
 def internal_server_error(error):
-    return (flask.render_template('lp_500.tmpl', 
+    return (flask.render_template('500.tmpl', 
                                   script_root=flask.request.script_root), 500)
 
 @app.route('/')

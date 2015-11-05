@@ -198,17 +198,17 @@ app = flask.Flask(__name__)
 
 @app.errorhandler(400)
 def not_found(error):
-    return (flask.render_template('search_400.tmpl', 
+    return (flask.render_template('400.tmpl', 
                                   script_root=flask.request.script_root), 400)
 
 @app.errorhandler(404)
 def not_found(error):
-    return (flask.render_template('search_404.tmpl', 
+    return (flask.render_template('404.tmpl', 
                                   script_root=flask.request.script_root), 404)
 
 @app.errorhandler(406)
 def not_found(error):
-    return (flask.render_template('search_406.tmpl', 
+    return (flask.render_template('406.tmpl', 
                                   script_root=flask.request.script_root), 406)
 
 @app.route('/')
