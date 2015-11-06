@@ -1,0 +1,16 @@
+#!/usr/bin/python
+
+import sys
+import jinja2
+
+in_fname = 'site_index.tmpl'
+out_fname = '/var/www/doi/index.html'
+
+env = jinja2.Environment(loader=jinja2.FileSystemLoader('apps/templates'))
+
+t = env.get_template(in_fname)
+open(out_fname, 'w').write(t.render() + '\n')
+
+sys.exit(0)
+
+# eof
