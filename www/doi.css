@@ -1,6 +1,31 @@
 body {
     font-family: "Helvetica", sans-serif;
-    font-size: 12px;
+}
+
+div {
+    border: 1px solid #000;
+}
+
+h1 {
+    text-align: center;
+}
+
+#links {
+    border: 1px solid #00f;
+    width: 100%;
+}
+
+#links a {
+    border: 1px solid #f00;
+    display: block;
+    float: left;
+    font-size: 150%;
+    text-align: center;
+    width: 49%;
+}
+
+#header + div {
+    clear: both;
 }
 
 table {
