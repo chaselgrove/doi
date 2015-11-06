@@ -1,0 +1,16 @@
+#!/usr/bin/python
+
+import sys
+import doi
+
+for c in doi.get_all_collections():
+    print c.id
+    if not c.doi:
+        continue
+    print c.doi
+    if c.doi.record_exists():
+        continue
+
+sys.exit(0)
+
+# eof

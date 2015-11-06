@@ -730,6 +730,13 @@ def get_all_projects():
             projects.append(project)
     return projects
 
+def get_all_collections():
+    with DBCursor() as c:
+        c.execute("SELECT * FROM collection")
+        cols = [ el[0] for el in c.description ]
+        row_dicts = [ dict(zip(cols, row)) for row in c ]
+    return [ _Collection(rd) for rd in row_dicts ]
+
 def get_entity(identifier):
     if not isinstance(identifier, basestring):
         raise TypeError('project identifier must be a string')
