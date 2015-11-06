@@ -7,8 +7,6 @@ import re
 from .doi import DOI, mint
 from .db import DBCursor
 
-test_flag = True
-
 bytes_re = re.compile('^(\d+) bytes$')
 files_re = re.compile('^(\d+) files$')
 
@@ -346,7 +344,8 @@ class _Collection(_Entity):
             publication_doi=None, 
             authors=None, 
             funder=None, 
-            update_others_flag=True):
+            update_others_flag=True, 
+            test_flag=False):
         """tag the collection with a DOI"""
         if self.identifier is not None:
             raise ValueError('collection has already been tagged')
