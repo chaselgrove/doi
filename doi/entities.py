@@ -278,8 +278,7 @@ class _Image(_Entity):
         if self._collections is None:
             self._collections = []
             for (type, identifier) in self.relatedidentifiers['IsPartOf']:
-                print identifier, self._project.identifier
-                if identifier != self._project.identifier:
+                if identifier != self.project.identifier:
                     self._collections.append(get_collection_by_doi(identifier))
         return self._collections
 
@@ -613,7 +612,7 @@ def get_collection_by_doi(identifier):
     with DBCursor() as c:
         c.execute("SELECT * FROM collection WHERE doi = %s", (identifier, ))
         if c.rowcount == 0:
-            raise ValueError('collection DOI %s not found' % id)
+            raise ValueError('collection DOI %s not found' % identifier)
         cols = [ el[0] for el in c.description ]
         d = dict(zip(cols, c.fetchone()))
     return _Collection(d)
