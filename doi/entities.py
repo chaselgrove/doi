@@ -63,6 +63,17 @@ _insert_collection_info_authors_sql = """INSERT INTO collection_info_author
                                                      (collection_info, author) 
                                          VALUES (%s, %s)"""
 
+_delete_collection_info_authors_sql = """DELETE FROM collection_info_author 
+                                          WHERE collection_info IN 
+                                                (SELECT id 
+                                                 FROM collection_info 
+                                                 WHERE collection = %s)"""
+
+_delete_collection_info_sql = """DELETE FROM collection_info 
+                                  WHERE collection = %s"""
+
+_clear_collection_doi_sql = "UPDATE collection SET doi = NULL where id = %s"
+
 class _Entity:
 
     def __init__(self, d):
@@ -207,6 +218,17 @@ class _Project(_Entity):
         self.doi.update_metadata(md, update_flag)
         return
 
+    def unnote_collection(self, collection, update_flag=True):
+        if not isinstance(collection, _Collection):
+            raise TypeError('collection must be a _Collection instance')
+        md = self.doi.copy_metadata()
+        related_identifiers = md['relatedidentifiers']
+        for ri in md['relatedidentifiers']:
+            if ri[0] == collection.doi.identifier:
+                md['relatedidentifiers'].remove(ri)
+        self.doi.update_metadata(md, update_flag)
+        return
+
 class _Subject:
 
     def __init__(self, d):
@@ -290,6 +312,16 @@ class _Image(_Entity):
             md['relatedidentifiers'] = []
         t = (collection.doi.identifier, 'DOI', 'IsPartOf')
         md['relatedidentifiers'].append(t)
+        self.doi.update_metadata(md, update_flag)
+        return
+
+    def unnote_collection(self, collection, update_flag=True):
+        if not isinstance(collection, _Collection):
+            raise TypeError('collection must be a _Collection instance')
+        md = self.doi.copy_metadata()
+        for ri in md['relatedidentifiers']:
+            if ri[0] == collection.doi.identifier:
+                md['relatedidentifiers'].remove(ri)
         self.doi.update_metadata(md, update_flag)
         return
 
@@ -400,6 +432,25 @@ class _Collection(_Entity):
                       publication_doi, 
                       authors, 
                       funder)
+        return
+
+    def untag(self, update_others_flag=True):
+        """untag the collection (remove the DOI association)"""
+        if self.identifier is None:
+            raise ValueError('collection has not been tagged')
+        with DBCursor() as c:
+            c.execute(_delete_collection_info_authors_sql, (self.id, ))
+            c.execute(_delete_collection_info_sql, (self.id, ))
+            c.execute(_clear_collection_doi_sql, (self.id, ))
+        projects = {}
+        for image in self.images:
+            if image.project.identifier not in projects:
+                projects[image.project.identifier] = image.project
+            image.unnote_collection(self, update_others_flag)
+        for project in projects.itervalues():
+            project.unnote_collection(self, update_others_flag)
+        self.doi.remove_local()
+        self.doi = None
         return
 
     def add_info(self, 

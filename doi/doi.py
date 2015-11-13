@@ -81,6 +81,14 @@ class DOI(ezid.DOI):
                       (self.landing_page, self.identifier))
         return
 
+    def remove_local(self):
+        """for collections only; no integrity checks; the DOI object 
+        should not be used afterwards"""
+        with db.DBCursor() as c:
+            c.execute("DELETE FROM doi WHERE identifier = %s", 
+                      (self.identifier, ))
+        return
+
 def mint(metadata, test=False):
     """mint a DOI using the test or UMMS prefix and set the landing page 
     to the virtualbrain landing page for the DOI
