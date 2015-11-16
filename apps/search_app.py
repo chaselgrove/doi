@@ -236,72 +236,94 @@ def post_search():
 @app.route('/<search_id>', methods=['GET', 'POST'])
 def search(search_id):
     search_url = flask.url_for('search', search_id=search_id)
+    tag_url = flask.url_for('tag', search_id=search_id)
     try:
         search = doi.get_search(search_id)
     except ValueError:
         flask.abort(404)
     projects = doi.get_all_projects()
-    res_dict = tag_dict_defaults
     if flask.request.method == 'GET':
         return flask.render_template('search_search.tmpl', 
                                      script_root=flask.request.script_root, 
                                      search=search, 
                                      projects=projects, 
                                      post_url=search_url, 
-                                     tag_form_dict=res_dict, 
+                                     tag_url=tag_url, 
                                      error=None)
-    if flask.request.form['submit'] == 'Update':
-        excludes = []
-        includes = []
-        for name in flask.request.form.keys():
-            if name.startswith('exclude_'):
-                excludes.append(doi.get_image(name[8:]))
-            if name.startswith('include_'):
-                includes.append(doi.get_image(name[8:]))
-        search.refine(excludes, includes)
-        error = None
-    elif flask.request.form['submit'] == 'Tag':
-        res_dict = parse_tag(flask.request.form)
-        if res_dict['status'] == 200:
-            if res_dict['pubmed_id']:
-                pubmed_id = res_dict['pubmed_id']
-            else:
-                pubmed_id = None
-            if res_dict['publication_doi']:
-                publication_doi = res_dict['publication_doi']
-            else:
-                publication_doi = None
-            if res_dict['authors']:
-                authors = res_dict['authors']
-            else:
-                authors = None
-            if res_dict['funder']:
-                funder = res_dict['funder']
-            else:
-                funder = None
-            if search.collection.identifier:
-                search.collection.add_info(res_dict['description'], 
-                                           pubmed_id, 
-                                           publication_doi, 
-                                           authors, 
-                                           funder)
-            else:
-                search.collection.tag(res_dict['description'], 
-                                      pubmed_id, 
-                                      publication_doi, 
-                                      authors, 
-                                      funder, 
-                                      update_others_flag=False, 
-                                      test_flag=True)
-            fmt = 'http://doi.virtualbrain.org/lp/%s'
-            url = fmt % search.collection.doi.identifier
-            return flask.redirect(url)
-        error = res_dict['error']
+    excludes = []
+    includes = []
+    for name in flask.request.form.keys():
+        if name.startswith('exclude_'):
+            excludes.append(doi.get_image(name[8:]))
+        if name.startswith('include_'):
+            includes.append(doi.get_image(name[8:]))
+    search.refine(excludes, includes)
     return flask.render_template('search_search.tmpl', 
                                  script_root=flask.request.script_root, 
                                  search=search, 
                                  projects=projects, 
                                  post_url=search_url, 
+                                 tag_url=tag_url, 
+                                 error=None)
+
+@app.route('/tag/<search_id>', methods=['GET', 'POST'])
+def tag(search_id):
+    search_url = flask.url_for('search', search_id=search_id)
+    tag_url = flask.url_for('tag', search_id=search_id)
+    try:
+        search = doi.get_search(search_id)
+    except ValueError:
+        flask.abort(404)
+    res_dict = tag_dict_defaults
+    if flask.request.method == 'GET':
+        return flask.render_template('search_tag.tmpl', 
+                                     script_root=flask.request.script_root, 
+                                     search=search, 
+                                     post_url=tag_url, 
+                                     search_url=search_url, 
+                                     tag_form_dict=res_dict, 
+                                     error=None)
+    res_dict = parse_tag(flask.request.form)
+    if res_dict['status'] == 200:
+        if res_dict['pubmed_id']:
+            pubmed_id = res_dict['pubmed_id']
+        else:
+            pubmed_id = None
+        if res_dict['publication_doi']:
+            publication_doi = res_dict['publication_doi']
+        else:
+            publication_doi = None
+        if res_dict['authors']:
+            authors = res_dict['authors']
+        else:
+            authors = None
+        if res_dict['funder']:
+            funder = res_dict['funder']
+        else:
+            funder = None
+        if search.collection.identifier:
+            search.collection.add_info(res_dict['description'], 
+                                       pubmed_id, 
+                                       publication_doi, 
+                                       authors, 
+                                       funder)
+        else:
+            search.collection.tag(res_dict['description'], 
+                                  pubmed_id, 
+                                  publication_doi, 
+                                  authors, 
+                                  funder, 
+                                  update_others_flag=False, 
+                                  test_flag=True)
+        fmt = 'http://doi.virtualbrain.org/lp/%s'
+        url = fmt % search.collection.doi.identifier
+        return flask.redirect(url)
+    error = res_dict['error']
+    return flask.render_template('search_tag.tmpl', 
+                                 script_root=flask.request.script_root, 
+                                 search=search, 
+                                 post_url=tag_url, 
+                                 search_url=search_url, 
                                  tag_form_dict=res_dict, 
                                  error=error)
 

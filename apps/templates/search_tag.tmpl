@@ -1,0 +1,36 @@
+{% extends "base.tmpl" %}
+
+{% block title %}Search{% endblock %}
+
+{% block body %}
+
+<p>
+This is a search, starting with {{ search.description }}.
+{% if search.modified() %}
+    The search results have been modified.
+{% endif %}
+</p>
+
+{% if error %}
+    ERROR: {{ error }}
+{% endif %}
+
+{% if feedback %}
+    {{ feedback }}
+{% endif %}
+
+<a href="{{ search_url }}">refine search</a>
+
+<form action="{{ post_url }}" method="POST">
+
+Publication PubMed ID: <input type="text" name="pubmed_id" value="{{ tag_form_dict['pubmed_id'] }}" />
+Publication DOI: <input type="text" name="publication_doi" value="{{ tag_form_dict['publication_doi'] }}" />
+Authors: <textarea name="authors">{{ '\n'.join(tag_form_dict['authors']) }}</textarea>
+Funder: <input type="text" name="funder" value="{{ tag_form_dict['funder'] }}" />
+Description: <textarea name="description">{{ tag_form_dict['description'] }}</textarea>
+<input type="submit" name="submit" value="Tag" />
+</form>
+
+</form>
+
+{% endblock %}
