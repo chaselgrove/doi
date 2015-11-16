@@ -4,12 +4,12 @@ import sys
 import doi
 
 for c in doi.get_all_collections():
-    print c.id
     if not c.doi:
         continue
-    print c.doi
     if c.doi.record_exists():
         continue
+    print 'untagging collection %s (%s)' % (c.id, c.doi.identifier)
+    c.untag()
 
 sys.exit(0)
 
