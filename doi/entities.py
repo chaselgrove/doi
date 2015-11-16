@@ -547,8 +547,12 @@ class _Search:
         """report if the initial search has been modified"""
         return self._collection_id != self._initial_collection_id
 
-    def refine(self, remove, add):
-        """refine the search results with lists of images"""
+    def refine(self, remove, add, strict=True):
+        """refine the search results with lists of images
+
+        unless strict is False, raises ValueError if any image in remove 
+        is not in the collection or if any image in add is in the collection
+        """
         if remove is None:
             remove = []
         if add is None:
@@ -564,18 +568,26 @@ class _Search:
         images = {}
         for image in self.collection.images:
             images[image.identifier] = image
-        for image in add:
-            if image.identifier in images:
-                msg = 'image %s is already in search results' % image.identifier
-                raise ValueError(msg)
-        for image in remove:
-            if image.identifier not in images:
-                msg = 'image %s is not in search results' % image.identifier
-                raise ValueError(msg)
-        for image in remove:
-            del images[image.identifier]
-        for image in add:
-            images[image.identifier] = image
+        if strict:
+            for image in add:
+                if image.identifier in images:
+                    fmt = 'image %s is already in search results'
+                    raise ValueError(fmt % image.identifier)
+            for image in remove:
+                if image.identifier not in images:
+                    fmt = 'image %s is not in search results'
+                    raise ValueError(fmt % image.identifier)
+            for image in remove:
+                del images[image.identifier]
+            for image in add:
+                images[image.identifier] = image
+        else:
+            for image in remove:
+                if image.identifier in images:
+                    del images[image.identifier]
+            for image in add:
+                if image.identifier not in images:
+                    images[image.identifier] = image
         collection = create_collection(images.values())
         self.set(collection)
         return

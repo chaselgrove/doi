@@ -257,7 +257,7 @@ def search(search_id):
             excludes.append(doi.get_image(name[8:]))
         if name.startswith('include_'):
             includes.append(doi.get_image(name[8:]))
-    search.refine(excludes, includes)
+    search.refine(excludes, includes, strict=False)
     return flask.render_template('search_search.tmpl', 
                                  script_root=flask.request.script_root, 
                                  search=search, 
