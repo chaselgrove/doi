@@ -450,7 +450,8 @@ class _Collection(_Entity):
         for project in projects.itervalues():
             project.unnote_collection(self, update_others_flag)
         self.doi.remove_local()
-        self.doi = None
+        self._doi = None
+        self.identifier = None
         return
 
     def add_info(self, 
