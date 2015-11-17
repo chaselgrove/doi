@@ -28,6 +28,12 @@ update_landing_page_sql = """UPDATE doi
 
 class DOI(ezid.DOI):
 
+#    @property
+#    def is_test(self):
+#        if self.identifier == '10.5072/FK2Q52M06K':
+#            return False
+#        return True
+
     def __init__(self, identifier):
         ezid.DOI.__init__(self, identifier)
         return

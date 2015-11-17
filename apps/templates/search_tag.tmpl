@@ -28,11 +28,27 @@ Publication DOI: <input type="text" name="publication_doi" value="{{ tag_form_di
 Authors: <textarea name="authors">{{ '\n'.join(tag_form_dict['authors']) }}</textarea>
 Funder: <input type="text" name="funder" value="{{ tag_form_dict['funder'] }}" />
 Description: <textarea name="description">{{ tag_form_dict['description'] }}</textarea>
-{% if tag_form_dict['test'] %}
-    Real: <input type="checkbox" name="not_test" value="true" />
+
+{% if search.collection.doi is none %}
+    new
+    {% if tag_form_dict['test'] %}
+        Real: <input type="checkbox" name="not_test" value="true" />
+    {% else %}
+        Real: <input type="checkbox" name="not_test" value="true" checked="checked" />
+    {% endif %}
 {% else %}
-    Real: <input type="checkbox" name="not_test" value="true" checked="checked" />
+    not new
+    {% if search.collection.doi.is_test %}
+        {% if tag_form_dict['test'] %}
+            Make real: <input type="checkbox" name="not_test" value="true" />
+        {% else %}
+            Make real: <input type="checkbox" name="not_test" value="true" checked="checked" />
+        {% endif %}
+    {% else %}
+        already real
+    {% endif %}
 {% endif %}
+
 <input type="submit" name="submit" value="Tag" />
 </form>
 

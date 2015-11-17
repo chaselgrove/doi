@@ -308,6 +308,11 @@ def tag(search_id):
         else:
             funder = None
         if search.collection.identifier:
+            # if this has been tagged with a test DOI but now needs to be made 
+            # real
+            if search.collection.doi.is_test and not res_dict['test']:
+                search.collection.untag(update_others_flag=False)
+        if search.collection.identifier:
             search.collection.add_info(res_dict['description'], 
                                        pubmed_id, 
                                        publication_doi, 
