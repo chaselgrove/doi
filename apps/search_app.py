@@ -171,10 +171,10 @@ def parse_tag(form):
         rd['funder'] = form['funder'].strip()
     if form.has_key('description'):
         rd['description'] = form['description']
-    if form.has_key('test') and form['test'] == 'true':
-        rd['test'] = True
-    else:
+    if form.has_key('not_test') and form['not_test'] == 'true':
         rd['test'] = False
+    else:
+        rd['test'] = True
     if not rd['description']:
         rd['error'] = 'no description given'
         rd['status'] = 400
