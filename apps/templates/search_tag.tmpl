@@ -28,6 +28,11 @@ Publication DOI: <input type="text" name="publication_doi" value="{{ tag_form_di
 Authors: <textarea name="authors">{{ '\n'.join(tag_form_dict['authors']) }}</textarea>
 Funder: <input type="text" name="funder" value="{{ tag_form_dict['funder'] }}" />
 Description: <textarea name="description">{{ tag_form_dict['description'] }}</textarea>
+{% if tag_form_dict['test'] %}
+    Test: <input type="checkbox" name="test" value="true" checked="checked" />
+{% else %}
+    Test: <input type="checkbox" name="test" value="true" />
+{% endif %}
 <input type="submit" name="submit" value="Tag" />
 </form>
 

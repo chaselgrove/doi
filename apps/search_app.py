@@ -21,7 +21,8 @@ tag_dict_defaults = {'pubmed_id': '',
                      'publication_doi': '', 
                      'authors': '', 
                      'funder': '', 
-                     'description': ''}
+                     'description': '', 
+                     'test': True}
 
 def parse_search(form):
     """parse a search form
@@ -145,6 +146,7 @@ def parse_tag(form):
             authors
             funder
             description
+            test
 
         if 400, all 200 fields including:
 
@@ -169,6 +171,10 @@ def parse_tag(form):
         rd['funder'] = form['funder'].strip()
     if form.has_key('description'):
         rd['description'] = form['description']
+    if form.has_key('test') and form['test'] == 'true':
+        rd['test'] = True
+    else:
+        rd['test'] = False
     if not rd['description']:
         rd['error'] = 'no description given'
         rd['status'] = 400
@@ -308,7 +314,11 @@ def tag(search_id):
                                        authors, 
                                        funder)
         else:
-            search.collection.tag(res_dict['description'], 
+            if res_dict['test']:
+                description = '%s (test)' % res_dict['description']
+            else:
+                description = '%s (not test)' % res_dict['description']
+            search.collection.tag(description, 
                                   pubmed_id, 
                                   publication_doi, 
                                   authors, 
