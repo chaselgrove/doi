@@ -4,56 +4,76 @@
 
 {% block body %}
 
-<p>
-This is a search, starting with {{ search.description }}.
-{% if search.modified() %}
-    The search results have been modified.
-{% endif %}
-</p>
+{# hit the logo to get the xnat jsessionid (needed to pass to the download page) #}
+<img src="http://doi.virtualbrain.org/xnat/images/logo.png" width="1" height="1" />
 
 {% if error %}
+<p class="error">
     ERROR: {{ error }}
+</p>
 {% endif %}
 
 {% if feedback %}
+<p class="feedback">
     {{ feedback }}
+</p>
 {% endif %}
 
-<a href="{{ tag_url }}">tag</a>
+<p>
+{% if not search.modified() %}
+    This page shows a collection of images starting with {{ search.description }}.
+{% else %}
+    This page shows a modified collection of images starting with {{ search.description }}.
+{% endif %}
+</p>
 
-<form action="http://doi.virtualbrain.org/xnat/app/action/DownloadSessionsAction2" method="POST">
+<p>
+Actions:
+</p>
 
-<input type="hidden" name="assessors" value="ir:CandiShareSegData" />
-<input type="hidden" name="download_option" value="applet" />
-<input type="hidden" name="eventSubmit_doPerform" value="Submit" />
-<input type="hidden" name="scan_format" value="NIfTI" />
-<input type="hidden" name="scan_format" value="ANALYZE" />
-<input type="hidden" name="scan_type" value="anat" />
-<input type="hidden" name="simplified" value="true" />
-{% for image in search.collection.images %}
-    <input type="hidden" name="sessions" value="{{ image.xnat_experiment_id }}" />
-{% endfor %}
+<ul>
+<li>
+    <form action="{{ tag_url }}">
+    <input type="submit" value="Tag"/>
+    Tag this collection with a DOI.
+    </form>
+</li>
+<li>
+    <form action="http://doi.virtualbrain.org/xnat/app/action/DownloadSessionsAction2" method="POST">
+    <input type="hidden" name="assessors" value="ir:CandiShareSegData" />
+    <input type="hidden" name="download_option" value="applet" />
+    <input type="hidden" name="eventSubmit_doPerform" value="Submit" />
+    <input type="hidden" name="scan_format" value="NIfTI" />
+    <input type="hidden" name="scan_format" value="ANALYZE" />
+    <input type="hidden" name="scan_type" value="anat" />
+    <input type="hidden" name="simplified" value="true" />
+    {% for image in search.collection.images %}
+        <input type="hidden" name="sessions" value="{{ image.xnat_experiment_id }}" />
+    {% endfor %}
+    <input type="submit" value="Download"/>
+    Download the data in this collection (the download package may contain more data than requested).
+    </form>
+</li>
+</ul>
 
-Note: The download package may contain more data than requested.
-
-<input type="submit"/ value="Download">
-
-</form>
+<p>
+Or refine the collection:
+</p>
 
 <form action="{{ post_url }}" method="POST">
 
-<input type="submit" name="submit" value="Update" />
+<input type="submit" name="submit" value="Refine" />
 
 <table>
     <tr>
-        <th>project</th>
-        <th>subject</th>
-        <th>gender</th>
-        <th>age</th>
-        <th>handedness</th>
-        <th>scan</th>
-        <th></th>
-        <th></th>
+        <th>Project</th>
+        <th>Subject</th>
+        <th>Gender</th>
+        <th>Age</th>
+        <th>Handedness</th>
+        <th>Scan</th>
+        <th>Include</th>
+        <th>Exclude</th>
     </tr>
 {% for project in projects %}
     {% for subject in project.subjects %}
@@ -75,9 +95,9 @@ Note: The download package may contain more data than requested.
                 <td>{{ image.type }}</td>
                 {% if search.collection.has_image(image) %}
                     <td></td>
-                    <td><input type="checkbox" name="exclude_{{ image.identifier }}" value="true" />Exclude</td>
+                    <td><input type="checkbox" name="exclude_{{ image.identifier }}" value="true" /></td>
                 {% else %}
-                    <td><input type="checkbox" name="include_{{ image.identifier }}" value="true" />Include</td>
+                    <td><input type="checkbox" name="include_{{ image.identifier }}" value="true" /></td>
                     <td></td>
                 {% endif %}
                 </td>
@@ -86,13 +106,8 @@ Note: The download package may contain more data than requested.
 {% endfor %}
 </table>
 
-<input type="submit" name="submit" value="Update" />
+<input type="submit" name="submit" value="Refine" />
 
 </form>
-
-
-
-{# hit the logo to get the xnat jsessionid (needed to pass to the download page) #}
-<img src="http://doi.virtualbrain.org/xnat/images/logo.png" width="1" height="1" />
 
 {% endblock %}
