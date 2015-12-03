@@ -15,10 +15,12 @@ div {
 
 #header h1 {
     float: left;
+    margin-left: 20px;
 }
 
 #header img {
     float: right;
+    margin-right: 20px;
 }
 
 #links {
