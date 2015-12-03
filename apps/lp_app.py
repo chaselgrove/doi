@@ -14,6 +14,13 @@ def doi_link(doi):
 def doi_link(pubmed_id):
     return '<a href="http://pubmed.org/%s">%s</a>' % (pubmed_id, pubmed_id)
 
+@app.template_filter('render_contributor')
+def render_contributor(contact):
+    (name, affiliation) = contact
+    if affiliation:
+        return '%s (%s)' % (name, affiliation)
+    return name
+
 @app.errorhandler(404)
 def not_found(error):
     return (flask.render_template('404.tmpl', 

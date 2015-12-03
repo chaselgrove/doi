@@ -10,7 +10,43 @@
 
 {% block lpbody %}
 
-<table>
+<p>
+<a href="{{ collection.link }}">Refine/download</a>
+</p>
+
+<table class="taginfo">
+    <tr>
+        <th>Description</th>
+        <th>PubMed ID</th>
+        <th>Publication DOI</th>
+        <th>Funder</th>
+        <th>Authors</th>
+    </tr>
+    {% for info in collection.info %}
+        <tr>
+            <td>{{ info['description'] }}</td>
+            <td>
+                {% if info['pubmed_id'] %}
+                    {{ info['pubmed_id'] | pubmed_link }}
+                {% endif %}
+            </td>
+            <td>
+                {% if info['pub_doi'] %}
+                    {{ info['pub_doi'] | doi_link}}
+                {% endif %}
+            </td>
+            <td>{{ info['funder'] }}</td>
+            <td>
+                {% for author in info['authors'] %}
+                    {{ author }}
+                    <br/>
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+<table class="metadata">
 
     <tr>
         <td>Source projects</td>
@@ -74,42 +110,6 @@
         </td>
     </tr>
 
-</table>
-
-<p>
-<a href="{{ collection.link }}">Refine/download</a>
-</p>
-
-<table>
-    <tr>
-        <th>Description</th>
-        <th>PubMed ID</th>
-        <th>Publication DOI</th>
-        <th>Funder</th>
-        <th>Authors</th>
-    </tr>
-    {% for info in collection.info %}
-        <tr>
-            <td>{{ info['description'] }}</td>
-            <td>
-                {% if info['pubmed_id'] %}
-                    {{ info['pubmed_id'] | pubmed_link }}
-                {% endif %}
-            </td>
-            <td>
-                {% if info['pub_doi'] %}
-                    {{ info['pub_doi'] | doi_link}}
-                {% endif %}
-            </td>
-            <td>{{ info['funder'] }}</td>
-            <td>
-                {% for author in info['authors'] %}
-                    {{ author }}
-                    <br/>
-                {% endfor %}
-            </td>
-        </tr>
-    {% endfor %}
 </table>
 
 {% endblock %}

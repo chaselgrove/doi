@@ -10,7 +10,7 @@
 
 {% block lpbody %}
 
-<table>
+<table class="metadata">
 
     <tr>
         <td>Creators</td>
@@ -27,13 +27,23 @@
     </tr>
 
     <tr>
-        <td>Contact</td>
-        <td>{{ project.contributors['ContactPerson'] }}</td>
+        <td>Contacts</td>
+        <td>
+            {% for contact in project.contributors['ContactPerson'] %}
+                {{ contact | render_contributor }}
+                <br/>
+            {% endfor %}
+        </td>
     </tr>
 
     <tr>
-        <td>Funder</td>
-        <td>{{ project.contributors['Funder'] }}</td>
+        <td>Funders</td>
+        <td>
+            {% for funder in project.contributors['Funder'] %}
+                {{ funder | render_contributor }}
+            <br/>
+            {% endfor %}
+        </td>
     </tr>
 
     <tr>

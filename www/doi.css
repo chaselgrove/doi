@@ -85,12 +85,29 @@ div {
 #body table {
     border: 1px solid #000;
     border-collapse: collapse;
-    font-size: smaller;
 }
 
 #body table td, table th {
     border: 1px solid #000;
     text-align: left;
+}
+
+#body table.refine {
+    font-size: smaller;
+}
+
+table.metadata td {
+    vertical-align: top;
+    padding: 5px;
+}
+
+table.taginfo td {
+    vertical-align: top;
+    padding: 5px;
+}
+
+table + table {
+    margin-top: 20px;
 }
 
 /* eof */
