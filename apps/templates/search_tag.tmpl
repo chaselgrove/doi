@@ -4,53 +4,82 @@
 
 {% block body %}
 
-<p>
-This is a search, starting with {{ search.description }}.
-{% if search.modified() %}
-    The search results have been modified.
-{% endif %}
-</p>
-
 {% if error %}
+<p class="error">
     ERROR: {{ error }}
+<p>
 {% endif %}
 
 {% if feedback %}
+<p class="feedback">
     {{ feedback }}
+</p>
 {% endif %}
 
-<a href="{{ search_url }}">refine search</a>
+<p>
+{% if not search.modified() %}
+    This page shows a collection of images starting with {{ search.description }}.
+{% else %}
+    This page shows a modified collection of images starting with {{ search.description }}.
+{% endif %}
+</p>
+
+<p>
+If you don't want to tag this collection, you can <a href="{{ search_url }}">go back</a> and refine or download the collection.
+</p>
 
 <form action="{{ post_url }}" method="POST">
 
-Publication PubMed ID: <input type="text" name="pubmed_id" value="{{ tag_form_dict['pubmed_id'] }}" />
-Publication DOI: <input type="text" name="publication_doi" value="{{ tag_form_dict['publication_doi'] }}" />
-Authors: <textarea name="authors">{{ '\n'.join(tag_form_dict['authors']) }}</textarea>
-Funder: <input type="text" name="funder" value="{{ tag_form_dict['funder'] }}" />
-Description: <textarea name="description">{{ tag_form_dict['description'] }}</textarea>
+<dl>
 
-{% if search.collection.doi is none %}
-    new
-    {% if tag_form_dict['test'] %}
-        Real: <input type="checkbox" name="not_test" value="true" />
-    {% else %}
-        Real: <input type="checkbox" name="not_test" value="true" checked="checked" />
-    {% endif %}
-{% else %}
-    not new
-    {% if search.collection.doi.is_test %}
-        {% if tag_form_dict['test'] %}
-            Make real: <input type="checkbox" name="not_test" value="true" />
+    <dt>Publication PMID</dt>
+    <dd><input type="text" name="pubmed_id" size="10" value="{{ tag_form_dict['pubmed_id'] }}" /></dd>
+
+    <dt>Publication DOI</dt>
+    <dd><input type="text" name="publication_doi" size="20" value="{{ tag_form_dict['publication_doi'] }}" /></dd>
+
+    <dt>
+        Authors
+        <br/>
+        (one per line)
+    </dt>
+    <dd><textarea cols="20" rows="5" name="authors">{{ '\n'.join(tag_form_dict['authors']) }}</textarea></dd>
+
+    <dt>Funder</dt>
+    <dd><input type="text" name="funder" size="40" value="{{ tag_form_dict['funder'] }}" /></dd>
+
+    <dt>Description</dt>
+    <dd><textarea cols="40" rows="5" name="description">{{ tag_form_dict['description'] }}</textarea></dd>
+
+</dl>
+
+<br/>
+
+        {% if search.collection.doi is none %}
+            This collection has not been tagged.
+            <br/>
+            Create a real (non-test) DOI:
+            {% if tag_form_dict['test'] %}
+                <input type="checkbox" name="not_test" value="true" />
+            {% else %}
+                <input type="checkbox" name="not_test" value="true" checked="checked" />
+            {% endif %}
         {% else %}
-            Make real: <input type="checkbox" name="not_test" value="true" checked="checked" />
+            {% if search.collection.doi.is_test %}
+                This collection is tagged with a test DOI.
+                {% if tag_form_dict['test'] %}
+                    Make real: <input type="checkbox" name="not_test" value="true" />
+                {% else %}
+                    Make real: <input type="checkbox" name="not_test" value="true" checked="checked" />
+                {% endif %}
+            {% else %}
+                This collection has a real (non-test) DOI.
+            {% endif %}
         {% endif %}
-    {% else %}
-        already real
-    {% endif %}
-{% endif %}
+
+<br/>
 
 <input type="submit" name="submit" value="Tag" />
-</form>
 
 </form>
 
