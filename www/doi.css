@@ -1,31 +1,61 @@
+#container {
+    min-width: 600px;
+}
+
 body {
     font-family: "Helvetica", sans-serif;
 }
 
 div {
-    border: 1px solid #000;
 }
 
-h1 {
-    text-align: center;
+#header {
+    background-color: #eef;
+}
+
+#header h1 {
+    float: left;
+}
+
+#header img {
+    float: right;
 }
 
 #links {
-    border: 1px solid #00f;
+    background-color: #aaf;
+    clear: both;
+    height: 20px;
     width: 100%;
 }
 
 #links a {
-    border: 1px solid #f00;
     display: block;
+    color: #000;
     float: left;
-    font-size: 150%;
+    font-size: 125%;
     text-align: center;
-    width: 33%;
+    text-decoration: none;
+    width: 150px;
 }
 
 #header + div {
     clear: both;
+}
+
+#footer {
+    background-color: #fff;
+    border-top: 1px solid #000;
+    padding-top: 10px;
+    height: 55px;
+}
+
+#footer img {
+    float: right;
+    margin: 5px 20px;
+}
+
+#body {
+    padding: 20px;
 }
 
 table {
