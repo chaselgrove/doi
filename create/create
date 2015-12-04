@@ -9,7 +9,7 @@ import doi
 import doi.db
 import info
 
-test_flag = True
+test_flag = False
 
 insert_subject_sql = """INSERT INTO subject (project, 
                                              label, 
