@@ -56,9 +56,10 @@ If you don't want to tag this collection, you can <a href="{{ search_url }}">go 
 <br/>
 
         {% if search.collection.doi is none %}
-            This collection has not been tagged.
+            This collection has not been tagged with a DOI.
             <br/>
-            Create a real (non-test) DOI:
+            <br/>
+            If you are test driving the system, please create a temporary test DOI.  If you would like to create a permanent DOI for this data set, please indicate this by checking here:
             {% if tag_form_dict['test'] %}
                 <input type="checkbox" name="not_test" value="true" />
             {% else %}
@@ -66,16 +67,17 @@ If you don't want to tag this collection, you can <a href="{{ search_url }}">go 
             {% endif %}
         {% else %}
             {% if search.collection.doi.is_test %}
-                This collection is tagged with a test DOI.
+                This collection is tagged with a temporary test DOI.  If you would like to create a permanent DOI for this data set, please indicate this by checking here:
                 {% if tag_form_dict['test'] %}
-                    Make real: <input type="checkbox" name="not_test" value="true" />
+                    <input type="checkbox" name="not_test" value="true" />
                 {% else %}
-                    Make real: <input type="checkbox" name="not_test" value="true" checked="checked" />
+                    <input type="checkbox" name="not_test" value="true" checked="checked" />
                 {% endif %}
             {% else %}
-                This collection has a real (non-test) DOI.
+                This collection has a permanent DOI.
             {% endif %}
         {% endif %}
+        <br/>
 
 <br/>
 

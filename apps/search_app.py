@@ -319,17 +319,14 @@ def tag(search_id):
                                        authors, 
                                        funder)
         else:
-            if res_dict['test']:
-                description = '%s (test)' % res_dict['description']
-            else:
-                description = '%s (not test)' % res_dict['description']
+            description = res_dict['description']
             search.collection.tag(description, 
                                   pubmed_id, 
                                   publication_doi, 
                                   authors, 
                                   funder, 
                                   update_others_flag=False, 
-                                  test_flag=True)
+                                  test_flag=res_dict['test'])
         fmt = 'http://doi.virtualbrain.org/lp/%s'
         url = fmt % search.collection.doi.identifier
         return flask.redirect(url)
