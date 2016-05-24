@@ -170,6 +170,23 @@ class _Entity:
             return []
         return self.doi.metadata['geolocations']
 
+    @property
+    def citation(self):
+        """APA citation"""
+        if len(self.creators) > 7:
+            authors = ', '.join([ name for (name, _) in self.creators[:6] ])
+            authors += ', ... %s' % self.creators[-1][0]
+        else:
+            authors = ', '.join([ name for (name, _) in self.creators[:-1] ])
+            authors += ', & %s' % self.creators[-1][0]
+        fmt = '%s. (%s).  %s.  %s.  http://doi.org/%s'
+        citation = fmt % (authors, 
+                          self.publicationyear, 
+                          self.title, 
+                          self.publisher, 
+                          self.identifier)
+        return citation
+
 class _Project(_Entity):
 
     def __init__(self, d):
