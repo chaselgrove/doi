@@ -327,7 +327,7 @@ def tag(search_id):
                                   funder, 
                                   update_others_flag=False, 
                                   test_flag=res_dict['test'])
-        fmt = 'http://doi.virtualbrain.org/lp/%s'
+        fmt = 'http://iaf.virtualbrain.org/lp/%s'
         url = fmt % search.collection.doi.identifier
         return flask.redirect(url)
     error = res_dict['error']

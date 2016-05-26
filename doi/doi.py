@@ -5,7 +5,7 @@ import ezid
 from .config import umms_doi_prefix, umms_auth, test_auth
 from . import db
 
-base_lp_url = 'http://doi.virtualbrain.org'
+base_lp_url = 'http://iaf.virtualbrain.org'
 
 select_sql = """SELECT metadata, landing_page, up_to_date 
                   FROM doi 

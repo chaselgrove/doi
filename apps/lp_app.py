@@ -38,7 +38,7 @@ def internal_server_error(error):
 
 @app.route('/')
 def index():
-    return flask.redirect('http://doi.virtualbrain.org/')
+    return flask.redirect('http://iaf.virtualbrain.org/')
 
 @app.route('/<path:identifier>')
 def landing_page(identifier):

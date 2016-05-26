@@ -5,7 +5,7 @@
 {% block body %}
 
 {# hit the logo to get the xnat jsessionid (needed to pass to the download page) #}
-<img src="http://doi.virtualbrain.org/xnat/images/logo.png" width="1" height="1" />
+<img src="http://iaf.virtualbrain.org/xnat/images/logo.png" width="1" height="1" />
 
 {% if error %}
 <p class="error">
@@ -39,7 +39,7 @@ Actions:
     </form>
 </li>
 <li>
-    <form action="http://doi.virtualbrain.org/xnat/app/action/DownloadSessionsAction2" method="POST">
+    <form action="http://iaf.virtualbrain.org/xnat/app/action/DownloadSessionsAction2" method="POST">
     <input type="hidden" name="assessors" value="ir:CandiShareSegData" />
     <input type="hidden" name="download_option" value="applet" />
     <input type="hidden" name="eventSubmit_doPerform" value="Submit" />

@@ -397,7 +397,7 @@ class _Collection(_Entity):
         """tag the collection with a DOI"""
         if self.identifier is not None:
             raise ValueError('collection has already been tagged')
-        url = 'http://doi.virtualbrain.org/search/reconstitute/%s' % self.id
+        url = 'http://iaf.virtualbrain.org/search/reconstitute/%s' % self.id
         md = {'creators': ['UMass/CANDI DOI project'], 
               'title': '(:tba)', 
               'publisher': 'UMass/CANDI DOI project', 

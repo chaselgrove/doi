@@ -28,7 +28,7 @@ insert_image_sql = """INSERT INTO image (doi,
                       VALUES (%s, %s, %s, %s, %s, %s)"""
 
 def anat_url(project, id):
-    url = 'http://doi.virtualbrain.org/xnat/app/action/'
+    url = 'http://iaf.virtualbrain.org/xnat/app/action/'
     url += 'DisplayItemAction/search_element/'
     url += 'xnat%3AmrSessionData/search_field/'
     url += 'xnat%3AmrSessionData.ID/search_value/'
@@ -38,7 +38,7 @@ def anat_url(project, id):
     return url
 
 def seg_url(project, id):
-    url = 'http://doi.virtualbrain.org/xnat/app/action/'
+    url = 'http://iaf.virtualbrain.org/xnat/app/action/'
     url += 'DisplayItemAction/search_element/'
     url += 'ir%3ACandiShareSegData/search_field/'
     url += 'ir%3ACandiShareSegData.ID/search_value/'

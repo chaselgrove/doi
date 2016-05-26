@@ -18,7 +18,7 @@ subjects = {}
 
 def get_subjects(project):
     if project not in subjects:
-        url = 'http://doi.virtualbrain.org/xnat/data/projects/%s/subjects?format=csv' % project
+        url = 'http://iaf.virtualbrain.org/xnat/data/projects/%s/subjects?format=csv' % project
         r = requests.get(url)
         r = csv.reader(StringIO.StringIO(r.content))
         header = r.next()
@@ -37,7 +37,7 @@ def get_image_info(project, subject, experiment):
         (experiment ID, N scan files, N scan file bytes), 
         (assessor ID, N assessor files, N assessor file bytes)
     """
-    url = 'http://doi.virtualbrain.org/xnat/data/projects/'
+    url = 'http://iaf.virtualbrain.org/xnat/data/projects/'
     url += project
     url += '/subjects/'
     url += subject
@@ -62,7 +62,7 @@ def get_image_info(project, subject, experiment):
 
 def get_subject_info(project, subject):
     """return (XNAT ID, gender, age, handedness) for an XNAT subject"""
-    url = 'http://doi.virtualbrain.org/xnat/data/projects/'
+    url = 'http://iaf.virtualbrain.org/xnat/data/projects/'
     url += project
     url += '/subjects/'
     url += subject
