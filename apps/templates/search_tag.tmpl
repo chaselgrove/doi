@@ -39,9 +39,7 @@ If you don't want to tag this collection, you can <a href="{{ search_url }}">go 
     <dd><input type="text" name="publication_doi" size="20" value="{{ tag_form_dict['publication_doi'] }}" /></dd>
 
     <dt>
-        Authors
-        <br/>
-        (one per line)
+        Authors (<em>lastname, firstname</em>; one per line)
     </dt>
     <dd><textarea cols="20" rows="5" name="authors">{{ '\n'.join(tag_form_dict['authors']) }}</textarea></dd>
 
