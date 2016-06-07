@@ -11,6 +11,10 @@
 {% block lpbody %}
 
 <p>
+If you are citing this data because of one of the references below, please cite the reference of interest.  If you are citing this data in its own right (independent of any of the references below), we suggest the following citation (APA): {{ collection.citation }}
+</p>
+
+<p>
 <a href="{{ collection.link }}">Refine/download</a>
 </p>
 
@@ -70,6 +74,20 @@
                     {{ identifier | doi_link }}
                 {% else %}
                     {{ type }} {{ identifier }}
+                {% endif %}
+                <br/>
+            {% endfor %}
+        </td>
+    </tr>
+
+    <tr>
+        <td>Creators</td>
+        <td>
+            {% for (name, affiliation) in collection.creators %}
+                {% if affiliation %}
+                    {{ name }} ({{ affiliation }})
+                {% else %}
+                    {{ name }}
                 {% endif %}
                 <br/>
             {% endfor %}

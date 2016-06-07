@@ -179,7 +179,7 @@ class _Entity:
         else:
             authors = ', '.join([ name for (name, _) in self.creators[:-1] ])
             authors += ', & %s' % self.creators[-1][0]
-        fmt = '%s. (%s).  %s.  %s.  http://dx.doi.org/%s'
+        fmt = '%s. (%s).  %s.  %s.  http://dx.doi.org/%s.'
         citation = fmt % (authors, 
                           self.publicationyear, 
                           self.title, 
