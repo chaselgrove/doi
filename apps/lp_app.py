@@ -12,7 +12,8 @@ def doi_link(doi):
 
 @app.template_filter('pubmed_link')
 def doi_link(pubmed_id):
-    return '<a href="http://pubmed.org/%s">%s</a>' % (pubmed_id, pubmed_id)
+    base_url = 'http://www.ncbi.nlm.nih.gov/pubmed/'
+    return '<a href="%s?term=%s">PMID %s</a>' % (base_url, pubmed_id, pubmed_id)
 
 @app.template_filter('render_contributor')
 def render_contributor(contact):
