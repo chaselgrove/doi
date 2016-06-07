@@ -8,6 +8,42 @@
 
 {% block pub_info %}{{ image.publisher }}, {{ image.publicationyear }}{% endblock %}
 
+{% block metatags %}
+
+<meta name="dc.title" content="{{ image.title }}" />
+
+{% for (name, affiliation) in image.creators %}
+    <meta name="dc.creator" content="{{ name }}" />
+{% endfor %}
+
+{% for (type, description) in image.descriptions %}
+    {% if type == "Abstract" %}
+        <meta name="dc.description" content="{{ description }}" />
+        <meta name="dc.abstract" content="{{ description }}" />
+    {% endif %}
+{% endfor %}
+
+<meta name="dc.publisher" content="{{ image.publisher }}" />
+
+<meta name="dc.date" content="{{ image.publicationyear }}" />
+
+{% for format in image.formats %}
+    <meta name="dc.format" content="{{ format }}" />
+{% endfor %}
+
+<meta name="dc.identifier" content="{{ image.identifier }}" />
+<meta name="dc.identifier" content="{{ image.link }}" />
+
+{% for place in image.geolocations %}
+    <meta name="dc.coverage" content="{{ place }}" />
+{% endfor %}
+
+{% for (rights, uri) in image.rights %}
+    <meta name="dc.rights" content="{{ rights }}" />
+{% endfor %}
+
+{% endblock %}
+
 {% block lpbody %}
 
 <p>

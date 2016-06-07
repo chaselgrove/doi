@@ -8,6 +8,43 @@
 
 {% block doi %}{{ collection.identifier }}{% endblock %}
 
+{% block metatags %}
+
+<meta name="dc.title" content="{{ collection.title }}" />
+
+{% for (name, affiliation) in collection.creators %}
+    <meta name="dc.creator" content="{{ name }}" />
+{% endfor %}
+
+{% for (type, description) in collection.descriptions %}
+    {% if type == "Abstract" %}
+        <meta name="dc.description" content="{{ description }}" />
+        <meta name="dc.abstract" content="{{ description }}" />
+    {% endif %}
+{% endfor %}
+
+<meta name="dc.publisher" content="{{ collection.publisher }}" />
+
+<meta name="dc.date" content="{{ collection.publicationyear }}" />
+
+{% for format in collection.formats %}
+    <meta name="dc.format" content="{{ format }}" />
+{% endfor %}
+
+<meta name="dc.identifier" content="{{ collection.identifier }}" />
+<meta name="dc.identifier" content="{{ collection.link }}" />
+
+{% for place in collection.geolocations %}
+    <meta name="dc.coverage" content="{{ place }}" />
+{% endfor %}
+
+{% for (rights, uri) in collection.rights %}
+    <meta name="dc.rights" content="{{ rights }}" />
+{% endfor %}
+
+{% endblock %}
+
+
 {% block lpbody %}
 
 <p>
