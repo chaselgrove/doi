@@ -398,9 +398,9 @@ class _Collection(_Entity):
         if self.identifier is not None:
             raise ValueError('collection has already been tagged')
         url = 'http://iaf.virtualbrain.org/search/reconstitute/%s' % self.id
-        md = {'creators': ['UMass/CANDI DOI project'], 
+        md = {'creators': ['UMass/CANDI Image Attribution Framework'], 
               'title': '(:tba)', 
-              'publisher': 'UMass/CANDI DOI project', 
+              'publisher': 'UMass/CANDI Image Attributation Framework', 
               'publicationyear': str(datetime.datetime.now().year), 
               'resourcetype': 'Dataset/Imaging Data', 
               'alternateidentifiers': [('URL', url)]}
