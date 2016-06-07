@@ -402,10 +402,16 @@ class _Collection(_Entity):
         for image in self.images:
             if image.project.identifier not in projects:
                 projects[image.project.identifier] = image.project
-        creators = set()
+        # get the creators from the source projects, staying unique over 
+        # (name, affiliation)
+        creator_dict = {}
         for project in projects.itervalues():
-            creators.update([ c[0] for c in project.creators ])
-        creators = list(sorted(creators))
+            for (name, affiliation) in project.creators:
+                ident = '%s--%s' % (name, affiliation)
+                creator_dict[ident] = (name, affiliation)
+        creators = []
+        for ident in sorted(creator_dict):
+            creators.append(creator_dict[ident])
         md = {'creators': creators, 
               'title': '(:tba)', 
               'publisher': 'UMass/CANDI Image Attributation Framework', 
