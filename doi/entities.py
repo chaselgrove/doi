@@ -398,7 +398,15 @@ class _Collection(_Entity):
         if self.identifier is not None:
             raise ValueError('collection has already been tagged')
         url = 'http://iaf.virtualbrain.org/search/reconstitute/%s' % self.id
-        md = {'creators': ['UMass/CANDI Image Attribution Framework'], 
+        projects = {}
+        for image in self.images:
+            if image.project.identifier not in projects:
+                projects[image.project.identifier] = image.project
+        creators = set()
+        for project in projects.itervalues():
+            creators.update([ c[0] for c in project.creators ])
+        creators = list(sorted(creators))
+        md = {'creators': creators, 
               'title': '(:tba)', 
               'publisher': 'UMass/CANDI Image Attributation Framework', 
               'publicationyear': str(datetime.datetime.now().year), 
@@ -408,11 +416,8 @@ class _Collection(_Entity):
         self.identifier = self._doi.identifier
         md = self.doi.copy_metadata()
         md['title'] = 'Image collection %s' % self.doi.identifier
-        projects = {}
         md['relatedidentifiers'] = []
         for image in self.images:
-            if image.project.identifier not in projects:
-                projects[image.project.identifier] = image.project
             t = (image.identifier, 'DOI', 'HasPart')
             md['relatedidentifiers'].append(t)
             image.note_collection(self, update_others_flag)
