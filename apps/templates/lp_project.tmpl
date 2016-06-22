@@ -52,6 +52,15 @@
 Suggested citation (APA): {{ project.citation }}
 </p>
 
+<p>
+<a href="{{ project.link }}">Project home</a>
+</p>
+
+{% for (type, description) in project.descriptions %}
+    <h4>{{ type }}</h4>
+    <p>{{ description }}</p>
+{% endfor %}
+
 <table class="metadata">
 
     <tr>
@@ -188,14 +197,5 @@ Suggested citation (APA): {{ project.citation }}
     </tr>
 
 </table>
-
-<p>
-<a href="{{ project.link }}">Project home</a>
-</p>
-
-{% for (type, description) in project.descriptions %}
-    <h4>{{ type }}</h4>
-    <p>{{ description }}</p>
-{% endfor %}
 
 {% endblock %}
