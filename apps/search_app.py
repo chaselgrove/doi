@@ -58,15 +58,15 @@ def parse_search(form):
           'age_min': '', 
           'age_max': ''}
     error = None
-    if form.has_key('age_min'):
+    if 'age_min' in form:
         rd['age_min'] = form['age_min'].strip()
     else:
         rd['age_min'] = ''
-    if form.has_key('age_max'):
+    if 'age_max' in form:
         rd['age_max'] = form['age_max'].strip()
     else:
         rd['age_max'] = ''
-    if form.has_key('gender'):
+    if 'gender' in form:
         rd['gender'] = form['gender']
         if form['gender'] == 'female':
             rd['gender_female_checked'] = 'checked'
@@ -80,7 +80,7 @@ def parse_search(form):
     else:
         rd['gender_either_checked'] = 'checked'
         error = 'no gender given'
-    if form.has_key('handedness'):
+    if 'handedness' in form:
         rd['handedness'] = form['handedness']
         if form['handedness'] == 'left':
             rd['handedness_left_checked'] = 'checked'
@@ -153,25 +153,25 @@ def parse_tag(form):
             error
     """
     rd = dict(tag_dict_defaults)
-    if form.has_key('pubmed_id'):
+    if 'pubmed_id' in form:
         rd['pubmed_id'] = form['pubmed_id'].strip()
-    if form.has_key('publication_doi'):
+    if 'publication_doi' in form:
         rd['publication_doi'] = form['publication_doi'].strip()
         if rd['publication_doi']:
             if not rd['publication_doi'].startswith('doi:'):
                 rd['publication_doi'] = 'doi:' + rd['publication_doi']
-    if form.has_key('authors'):
+    if 'authors' in form:
         rd['authors'] = []
         for author in form['authors'].split('\n'):
             author = author.strip()
             if not author:
                 continue
             rd['authors'].append(author)
-    if form.has_key('funder'):
+    if 'funder' in form:
         rd['funder'] = form['funder'].strip()
-    if form.has_key('description'):
+    if 'description' in form:
         rd['description'] = form['description']
-    if form.has_key('not_test') and form['not_test'] == 'true':
+    if 'not_test' in form and form['not_test'] == 'true':
         rd['test'] = False
     else:
         rd['test'] = True

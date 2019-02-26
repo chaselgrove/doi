@@ -405,7 +405,7 @@ class _Collection(_Entity):
         # get the creators from the source projects, staying unique over 
         # (name, affiliation)
         creator_dict = {}
-        for project in projects.itervalues():
+        for project in projects.values():
             for (name, affiliation) in project.creators:
                 ident = '%s--%s' % (name, affiliation)
                 creator_dict[ident] = (name, affiliation)
@@ -428,7 +428,7 @@ class _Collection(_Entity):
             md['relatedidentifiers'].append(t)
             image.note_collection(self, update_others_flag)
         rights = set()
-        for (identifier, project) in projects.iteritems():
+        for (identifier, project) in projects.items():
             t = (identifier, 'DOI', 'IsDerivedFrom')
             md['relatedidentifiers'].append(t)
             project.note_collection(self, update_others_flag)
@@ -475,7 +475,7 @@ class _Collection(_Entity):
             if image.project.identifier not in projects:
                 projects[image.project.identifier] = image.project
             image.unnote_collection(self, update_others_flag)
-        for project in projects.itervalues():
+        for project in projects.values():
             project.unnote_collection(self, update_others_flag)
         self.doi.remove_local()
         self._doi = None
@@ -622,16 +622,16 @@ class _Search:
         return
 
 def create_identifier(s):
-    if not isinstance(s, basestring):
+    if not isinstance(s, str):
         raise TypeError('argument must be a string')
-    h = hashlib.sha256(s)
+    h = hashlib.sha256(s.encode('utf-8'))
     return h.hexdigest()[:8]
 
 def random_identifier():
     return create_identifier(str(random.random()))
 
 def get_project(identifier):
-    if not isinstance(identifier, basestring):
+    if not isinstance(identifier, str):
         raise TypeError('project identifier must be a string')
     with DBCursor() as c:
         c.execute("SELECT * FROM project WHERE doi = %s", (identifier, ))
@@ -642,7 +642,7 @@ def get_project(identifier):
     return _Project(d)
 
 def get_project_by_xnat_id(xnat_id):
-    if not isinstance(xnat_id, basestring):
+    if not isinstance(xnat_id, str):
         raise TypeError('project XNAT ID must be a string')
     with DBCursor() as c:
         c.execute("SELECT * FROM project WHERE xnat_id = %s", (xnat_id, ))
@@ -653,9 +653,9 @@ def get_project_by_xnat_id(xnat_id):
     return _Project(d)
 
 def get_subject(project, label):
-    if not isinstance(project, basestring):
+    if not isinstance(project, str):
         raise TypeError('subject project must be a string')
-    if not isinstance(label, basestring):
+    if not isinstance(label, str):
         raise TypeError('subject label must be a string')
     with DBCursor() as c:
         c.execute("SELECT * FROM subject WHERE project = %s AND label = %s", 
@@ -677,7 +677,7 @@ def get_all_subjects():
     return subjects
 
 def get_image(identifier):
-    if not isinstance(identifier, basestring):
+    if not isinstance(identifier, str):
         raise TypeError('image identifier must be a string')
     with DBCursor() as c:
         c.execute("SELECT * FROM image WHERE doi = %s", (identifier, ))
@@ -688,7 +688,7 @@ def get_image(identifier):
     return _Image(d)
 
 def get_collection(id):
-    if not isinstance(id, basestring):
+    if not isinstance(id, str):
         raise TypeError('collection ID must be a string')
     with DBCursor() as c:
         c.execute("SELECT * FROM collection WHERE id = %s", (id, ))
@@ -699,7 +699,7 @@ def get_collection(id):
     return _Collection(d)
 
 def get_collection_by_doi(identifier):
-    if not isinstance(identifier, basestring):
+    if not isinstance(identifier, str):
         raise TypeError('collection DOI must be a string')
     with DBCursor() as c:
         c.execute("SELECT * FROM collection WHERE doi = %s", (identifier, ))
@@ -710,7 +710,8 @@ def get_collection_by_doi(identifier):
     return _Collection(d)
 
 def create_collection(images):
-    if not isinstance(images, (tuple, list)):
+    print(images)
+    if not isinstance(images, (tuple, list, type({}.values()))):
         raise TypeError('images must be a tuple or list')
     for im in images:
         if not isinstance(im, _Image):
@@ -734,7 +735,7 @@ def create_collection(images):
     return collection
 
 def get_search(id):
-    if not isinstance(id, basestring):
+    if not isinstance(id, str):
         raise TypeError('search ID must be a string')
     with DBCursor() as c:
         c.execute("SELECT * FROM search WHERE id = %s", (id, ))
@@ -829,7 +830,7 @@ def get_all_collections():
     return [ _Collection(rd) for rd in row_dicts ]
 
 def get_entity(identifier):
-    if not isinstance(identifier, basestring):
+    if not isinstance(identifier, str):
         raise TypeError('project identifier must be a string')
     with DBCursor() as c:
         c.execute("SELECT type FROM entity WHERE doi = %s", (identifier, ))

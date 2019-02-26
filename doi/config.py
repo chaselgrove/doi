@@ -1,8 +1,8 @@
 """DOI configuration"""
 
-import ConfigParser
+import configparser
 
-cp = ConfigParser.ConfigParser()
+cp = configparser.ConfigParser()
 cp.read('/etc/doi.config')
 
 test_auth = (cp.get('test', 'username'), cp.get('test', 'password'))
