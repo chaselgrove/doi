@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import sys
 import doi
@@ -8,7 +8,7 @@ for c in doi.get_all_collections():
         continue
     if c.doi.record_exists():
         continue
-    print 'untagging collection %s (%s)' % (c.id, c.doi.identifier)
+    print('untagging collection %s (%s)' % (c.id, c.doi.identifier))
     c.untag()
 
 sys.exit(0)
